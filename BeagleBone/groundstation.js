@@ -44,7 +44,7 @@ var options = {
 /* Initialize Server on Port 8888 */
 var server = http.createServer(function (req, res) {
    /* Request HTML Files */
-   var file = '.' + ((req.url == '/') ? '/index.html' : req.url);
+   var file = '/var/lib/cloud9/autorun' + ((req.url == '/') ? '/index.html' : req.url);
    var fileExtension = path.extname(file);
    var contentType = 'text/html';
     
@@ -78,7 +78,7 @@ var io = require('socket.io').listen(server);
 /* On Established Connection */
 io.on('connection', function (socket) {
    socket.on('updateKeyVector', handleMotorChange);
-   socket.on('handleRadioButtons', handleMotorSpeed);
+   socket.on('handleSlider', handleMotorSpeed);
    socket.on('changeLEDs', handleLEDs);
 });
 
