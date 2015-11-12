@@ -7,6 +7,7 @@ var b = require('bonescript');
 // constants used for bit masking
 const parity_shift = 0;
 const motor_shift = 1;
+const speed_size = 3;
 const speed_shift = 11;
 const light_shift = 14;
 const command_size = 32;
@@ -164,7 +165,9 @@ function handleMotorSpeed(data) {
     console.log("Speed = " + newData.state);
     
     //update bit vector and send to arduino of serial 1 
+    console.log("SpeedDEbug: " + newData.state);
     set_speed(newData.state);
+    console.log("Binary Speed: " + bin(command));
     send_command();
 }
 
@@ -206,7 +209,14 @@ function set_speed(speed) {
    if(speed < 0 || speed > 7)
       throw new Error('Speed setting out of range: 0-7');
    
+   clear_speed();
    command |= speed << speed_shift;
+}
+
+function clear_speed() {
+   for(var i = 0; i < speed_size; i++) {
+      command &= ~(1 << (i + speed_shift));
+   }
 }
 
 // sets the motor command bits
