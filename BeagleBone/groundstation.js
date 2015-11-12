@@ -33,6 +33,7 @@ const yaw_left = 10;
 
 /* Command Bit Vector (as Integer) */
 var command = 0;
+var old_command = 0;
 
 /* Define Serial Port and Options */
 var port = '/dev/ttyO2';
@@ -162,7 +163,10 @@ function handleMotorChange(data) {
    }
     
    /* Send Newly Updated Command */
-   send_command();  
+   if (old_command != command) {
+      send_command();
+   }
+   old_command = command;
 } 
 
 /* Handles Lights Setting */
@@ -232,6 +236,9 @@ function set_motor() {
    if (arguments.length > motor_size) {
       throw new Error('Too many motor commands');
    }
+   
+   /* Clear Old Motor Commands */
+   clear_motor();
    
    for (var i = 0; i < arguments.length; i++) {
       switch (arguments[i]) {
@@ -315,9 +322,6 @@ function send_command() {
    b.serialWrite(port, [command2]);
    b.serialWrite(port, [command3]);
    b.serialWrite(port, [command4]);
-   
-   /* Clear Old Motor Commands */
-   clear_motor();
 }
 
 /* Clears Command Vector */
