@@ -34,6 +34,14 @@
         var key_dict = [];
         var keyvector = 0;
 
+        /* Show IMU Data on Control Station */
+        socket.on('imu', function (data) {
+            var imu_data = JSON.parse(data);
+            document.getElementById("roll").innerHTML = imu_data.roll + ' Deg';
+            document.getElementById("pitch").innerHTML = imu_data.pitch + ' Deg';
+            document.getElementById("yaw").innerHTML = imu_data.yaw + ' Deg';
+        });
+
         function create_key_dict() {
             key_dict[key_up_arrow] = forward;
             key_dict[key_down_arrow] = backward;
@@ -149,7 +157,7 @@
                                 <p>Roll</p>
                             </td>
                             <td nowrap style="border: 1px solid white; border-collapse: collapse">
-                                <p id="">
+                                <p id="roll">
                                     0 Deg
                                 </p>
                             </td>
@@ -159,7 +167,7 @@
                                 <p>Pitch</p>
                             </td>
                             <td nowrap style="border: 1px solid white; border-collapse: collapse">
-                                <p id="">
+                                <p id="pitch">
                                     0 Deg
                                 </p>
                             </td>
@@ -169,7 +177,7 @@
                                 <p>Yaw</p>
                             </td>
                             <td nowrap style="border: 1px solid white; border-collapse: collapse">
-                                <p id="">
+                                <p id="yaw">
                                     0 Deg
                                 </p>
                             </td>

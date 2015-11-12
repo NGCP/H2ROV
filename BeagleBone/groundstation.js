@@ -31,6 +31,11 @@ const pitch_down = 8;
 const yaw_right = 9;
 const yaw_left = 10;
 
+/* IMU Conversion Constants */
+const max_byte = 255;
+const max_angle = 360;
+const angle_offset = 180;
+
 /* Command Bit Vector (as Integer) */
 var command = 0;
 var old_command = 0;
@@ -38,7 +43,8 @@ var old_command = 0;
 /* Define Serial Port and Options */
 var port = '/dev/ttyO2';
 var options = {
-   baudrate: 115200
+   baudrate: 115200,
+   //parser: b.serialParsers.readline('\n')
 };
 
 /* Initialize Server on Port 8888 */
@@ -98,12 +104,30 @@ function onSerial(x) {
    
    /* Check Serial Opening */
    if (x.event == 'open') {
+      
       console.log('Serial Opened Successfully!');
    }
    
    /* Serial Data */
    if (x.event == 'data') {
-      console.log(String(x.data));
+      sendIMUData(x.data);
+   }
+}
+
+function sendIMUData(data) {
+   var roll = 0, pitch = 0, yaw = 0;
+   var imu_data;
+   
+   if (data[2]) {
+      roll = Math.floor(data[0] * (max_angle / max_byte) - angle_offset);
+      pitch = Math.floor(data[1] * (max_angle / max_byte) - angle_offset);
+      yaw = Math.floor(data[2] * (max_angle / max_byte));
+      
+      imu_data = '{"roll": ' + roll +
+                 ', "pitch": ' + pitch +
+                 ', "yaw": ' + yaw + '}';
+      
+      io.sockets.emit('imu', imu_data);
    }
 }
 
