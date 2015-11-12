@@ -1,0 +1,66 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'install', 'bonescript' ]
+2 info using npm@1.4.21
+3 info using node@v0.10.42
+4 verbose cache add [ 'bonescript', null ]
+5 verbose cache add name=undefined spec="bonescript" args=["bonescript",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'bonescript',
+6 verbose parsed url   path: 'bonescript',
+6 verbose parsed url   href: 'bonescript' }
+7 silly lockFile 2aaea44e-bonescript bonescript
+8 verbose lock bonescript /root/.npm/2aaea44e-bonescript.lock
+9 silly lockFile 2aaea44e-bonescript bonescript
+10 silly lockFile 2aaea44e-bonescript bonescript
+11 verbose addNamed [ 'bonescript', '' ]
+12 verbose addNamed [ null, '*' ]
+13 silly lockFile 21e9adfc-bonescript bonescript@
+14 verbose lock bonescript@ /root/.npm/21e9adfc-bonescript.lock
+15 silly addNameRange { name: 'bonescript', range: '*', hasData: false }
+16 verbose request where is /bonescript
+17 verbose request registry https://registry.npmjs.org/
+18 verbose request id 5ab391a87cb670e0
+19 verbose url raw /bonescript
+20 verbose url resolving [ 'https://registry.npmjs.org/', './bonescript' ]
+21 verbose url resolved https://registry.npmjs.org/bonescript
+22 verbose request where is https://registry.npmjs.org/bonescript
+23 info trying registry request attempt 1 at 19:03:59
+24 http GET https://registry.npmjs.org/bonescript
+25 info retry will retry, error on last attempt: Error: CERT_NOT_YET_VALID
+26 info trying registry request attempt 2 at 19:04:11
+27 http GET https://registry.npmjs.org/bonescript
+28 info retry will retry, error on last attempt: Error: CERT_NOT_YET_VALID
+29 info trying registry request attempt 3 at 19:05:12
+30 http GET https://registry.npmjs.org/bonescript
+31 silly lockFile 21e9adfc-bonescript bonescript@
+32 silly lockFile 21e9adfc-bonescript bonescript@
+33 error Error: CERT_NOT_YET_VALID
+33 error     at SecurePair.<anonymous> (tls.js:1381:32)
+33 error     at SecurePair.emit (events.js:92:17)
+33 error     at SecurePair.maybeInitFinished (tls.js:980:10)
+33 error     at CleartextStream.read [as _read] (tls.js:472:13)
+33 error     at CleartextStream.Readable.read (_stream_readable.js:341:10)
+33 error     at EncryptedStream.write [as _write] (tls.js:369:25)
+33 error     at doWrite (_stream_writable.js:226:10)
+33 error     at writeOrBuffer (_stream_writable.js:216:5)
+33 error     at EncryptedStream.Writable.write (_stream_writable.js:183:11)
+33 error     at write (_stream_readable.js:602:24)
+33 error     at flow (_stream_readable.js:611:7)
+33 error     at Socket.pipeOnReadable (_stream_readable.js:643:5)
+34 error If you need help, you may report this *entire* log,
+34 error including the npm and node versions, at:
+34 error     <http://github.com/npm/npm/issues>
+35 error System Linux 3.8.13-bone79
+36 error command "/usr/bin/nodejs" "/usr/bin/npm" "install" "bonescript"
+37 error cwd /var/lib/cloud9/H2ROV/BeagleBone
+38 error node -v v0.10.42
+39 error npm -v 1.4.21
+40 verbose exit [ 1, true ]
