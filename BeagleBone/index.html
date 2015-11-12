@@ -1,27 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>H2ROV GROUNDSTATION</title>
+    <title>H2ROV GROUND CONTROL STATION INTERFACE</title>
     <script src = "/socket.io/socket.io.js" ></script>
+    <script src="/js/vendor/modernizr.js"></script>
+    
     <script>
         // Establishing connection with server
         var socket = io.connect();
 
-        // Changes the led state
-        function changeState(state){
-            if (state==1){
+        // Changes the motor state/led state 
+        function changeState(state) {
+            if (state == 1) {
                 // Emit message changing the state to 1
                 socket.emit('changeState', '{"state":1}');
-                // Change led status on web page to ON
-                document.getElementById("outputStatus").innerHTML = "Status: ON";
+                // Change motor status on web page to FORWARD
+                document.getElementById("outputStatus").innerHTML = "Status: FORWARD";
             }
-            else if (state==0){
+            else if (state == 2) {
+                // Emit message changing the state to 2
+                socket.emit('changeState', '{"state":2}');
+                // Change motor status on web page to Reverse
+                document.getElementById("outputStatus").innerHTML = "Status: REVERSE";
+            }
+            else if (state == 0) {
                 // Emit message changing the state to 0
                 socket.emit('changeState', '{"state":0}');
-                // Change led status on web page to OFF
-                document.getElementById("outputStatus").innerHTML = "Status: OFF";
+                // Change motor status on web page to IDLE
+                document.getElementById("outputStatus").innerHTML = "Status: IDLE";
+            }
+            
+            if (state == 3) {
+                // Emit message changing the state to 3
+                socket.emit('changeState', '{"state":3}');
+                // Change led status to on 
+                document.getElementById("lights").innerHTML = "LED Status: ON";
+            }
+            else if (state == 4) {
+                // Emit message changing the state to 4
+                socket.emit('changeState', '{"state":4}');
+                // Change led status to off
+                document.getElementById("lights").innerHTML = "LED Status: OFF";
             }
         }
+        /*
+        function toggleLights(state) {
+            if (state == 1) {
+                //toggle light on     
+                socket.emit('toggleLights', '{"state":1}');
+                // Change led status on web page to ON
+                document.getElementById("toggleLights").innerHTML = "LED Status: OFF";
+            }
+            else if (state == 0) {
+                //toggle light off
+                socket.emit('toggleLights', '{"state":0}');
+                // Change led status on web page to ON
+                document.getElementById("toggleLights").innerHTML = "LED Status: OFF";    
+            }
+        }*/
         
         window.addEventListener("keydown", handleKeyPressed, false);
         window.addEventListener("keyup", handleKeyReleased, false);
@@ -36,7 +72,7 @@
             
             //REVERSE 
             else if (event.keyCode == 40) { //40 is the down arrow key 
-                changeState(1);
+                changeState(2);
                 //add code to reverse motor 
             }
         }
@@ -45,12 +81,53 @@
             changeState(0);
         }
         
+        function handleRadioButtons(speed) {
+           socket.emit('handleRadioButtons', '{"state":' + speed + '}');
+           document.getElementById("speed").innerHTML = "Motor Speed: " + speed;
+        }
+
+        
+        //default motor speed init of 1 
+        handleRadioButtons(1);
+ 
     </script>
+    
 </head>
-    <h2>MOTOR</h2>
+
+    <h2>H2ROV GROUND CONTROL STATION INTERFACE</h2>
     <p id="outputStatus">Status</p>
-    <button type="button" onclick="changeState(1);">ON</button>
-    <button type="button" onclick="changeState(0);">OFF</button>
-</div>
+    <p id="lights">LED Status</p>
+    <p id="speed">Motor Speed</p>
+    <button type="button" onclick="changeState(3);">ON</button>
+    <button type="button" onclick="changeState(4);">OFF</button>
+
+<!--
+<div class="range-slider vertical-range" data-slider data-options="step: 1; vertical: true; start: 1; end: 7;">
+  <span class="range-slider-handle" role="slider" tabindex="0" aria-label="motorSpeeds"></span>
+  <span class="range-slider-active-segment"></span>
+  <input type="hidden">
+</div> -->
+
+
+
+<body>
+  <!--
+  <script src="/js/vendor/jquery.js"></script>
+  <script src="/js/vendor/fastclick.js"></script>
+  <script src="/js/foundation.min.js"></script> 
+  -->
+  
+  <form>
+    <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
+    <input type="radio" name="speed" value="2" onclick = "handleRadioButtons(2)"> 2<br>
+    <input type="radio" name="speed" value="3" onclick = "handleRadioButtons(3)"> 3<br>  
+    <input type="radio" name="speed" value="4" onclick = "handleRadioButtons(4)"> 4<br>  
+    <input type="radio" name="speed" value="5" onclick = "handleRadioButtons(5)"> 5<br>  
+    <input type="radio" name="speed" value="6" onclick = "handleRadioButtons(6)"> 6<br>  
+    <input type="radio" name="speed" value="7" onclick = "handleRadioButtons(7)"> 7<br>  
+  </form> 
+  
+  
+  
 </body>
 </html>
