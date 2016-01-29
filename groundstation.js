@@ -4,6 +4,25 @@ var fs = require('fs');
 var path = require('path');
 var b = require('bonescript');
 
+var port = '/dev/ttyO2';
+var options = {
+    baudrate: 9600
+};
+
+b.serialOpen(port, options, onSerial);
+
+function onSerial(x) {
+    if (x.err) {
+        console.log('***ERROR*** ' + JSON.stringify(x));
+    }
+    if (x.event == 'open') {
+       console.log('***OPENED***');
+    }
+    if (x.event == 'data') {
+        console.log(String(x.data));
+    }
+}
+
 // Create a variable called key, which refers to P9_14
 var key = "P9_14";
 // Initialize the led as an OUTPUT
@@ -51,7 +70,12 @@ function handleChangeState(data) {
     var newData = JSON.parse(data);
     console.log("LED = " + newData.state);
     // turns the LED ON or OFF
-    b.digitalWrite(key, newData.state);
+	 if (newData.state == '1') {
+        b.serialWrite(port, [0x01]);
+    }
+    else if (newData.state == '2') {
+        b.serialWrite(port, [0x02]);
+    }
 }
 
 // Displaying a console message for user feedback
