@@ -43,21 +43,6 @@
                 document.getElementById("lights").innerHTML = "LED Status: OFF";
             }
         }
-        /*
-        function toggleLights(state) {
-            if (state == 1) {
-                //toggle light on     
-                socket.emit('toggleLights', '{"state":1}');
-                // Change led status on web page to ON
-                document.getElementById("toggleLights").innerHTML = "LED Status: OFF";
-            }
-            else if (state == 0) {
-                //toggle light off
-                socket.emit('toggleLights', '{"state":0}');
-                // Change led status on web page to ON
-                document.getElementById("toggleLights").innerHTML = "LED Status: OFF";    
-            }
-        }*/
         
         window.addEventListener("keydown", handleKeyPressed, false);
         window.addEventListener("keyup", handleKeyReleased, false);
