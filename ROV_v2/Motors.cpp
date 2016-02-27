@@ -123,7 +123,7 @@ float lateral_thrust(int positive, int negative, int speed) {
 void motor_calculation(User_Commands user_commands) {
   float m1, m2, m3, m4, m5, m6;
   float surge_thrust, sway_thrust, heave_thrust;
-  float depth_ref = BUOY / (float)2;
+  float depth_ref = BUOY * sin((float)eul_angles[1] / ANGLE_SCALE) / (float)2;
   float pitch_correction, pitch_angle;
   int speed = user_commands.speed;
 
