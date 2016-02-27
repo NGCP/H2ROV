@@ -1,4 +1,5 @@
-//var b = require('bonescript');
+var b = require('bonescript');
+
 
 // constants used for bit masking
 const parity_shift = 0;
@@ -12,7 +13,7 @@ const motor_size = 10;
 const down = 1;
 const up = 2;
 const backward = 3;
-const foward = 4;
+const forward = 4;
 const right = 5;
 const left = 6;
 const pitch_up = 7;
@@ -26,24 +27,6 @@ var port = '/dev/tty02';
 var options = { 
    baudrate: 9600
 };
-
-// opens the serial port between BBB and Arduino
-// does not require any parameters
-function serial_open() {
-   b.serialOpen(port, options, onSerial);
-
-   function onSerial(x) {
-      if (x.err) {
-         console.log('***ERROR*** ' + JSON.stringify(x));
-      }
-      if (x.event == 'open') {
-         console.log('***OPENED***');
-      }
-      if (x.event == 'data') {
-         console.log(String(x.data));
-      }
-   }
-}
 
 
 function set_light(setting) {
@@ -85,7 +68,7 @@ function set_motor() {
          case "backward":
             set_bit(backward);
             break;
-         case "foward":
+         case "forward":
             set_bit(forward);
             break;
          case "right":
@@ -107,21 +90,21 @@ function set_motor() {
             set_bit(yaw_left);
             break;
          default:
-            throw new Error('Invalid motor command' + arguments[i]);
+            throw new Error('Invalid motor command: ' + arguments[i]);
       }
    }
 
    // sanity checks
    if(check_bit(up) && check_bit(down))
       throw new Error('Cannot set both up and down');
-   if(check_bit(backward) && check_bit(foward))
+   if(check_bit(backward) && check_bit(forward))
       throw new Error('Cannot set both backward and forward');
    if(check_bit(right) && check_bit(left))
       throw new Error('Cannot set both left and right');
    if(check_bit(pitch_up) && check_bit(pitch_down))
       throw new Error('Cannot set both pitch up and down');
    if(check_bit(yaw_right) && check_bit(yaw_left))
-      throw new Erorr('Cannot set both yaw left and right');
+      throw new Error('Cannot set both yaw left and right');
 }
 
 function clear_motor() {
@@ -172,7 +155,7 @@ function print_command() {
 }
 
 // export public functions
-module.exports.serial_open = serial_open;
+//module.exports.serial_open = serial_open;
 module.exports.set_light = set_light;
 module.exports.set_speed = set_speed;
 module.exports.set_motor = set_motor;

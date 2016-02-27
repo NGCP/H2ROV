@@ -3,45 +3,33 @@
 <head>
     <title>H2ROV GROUND CONTROL STATION INTERFACE</title>
     <script src = "/socket.io/socket.io.js" ></script>
-    <script src="/js/vendor/modernizr.js"></script>
     
     <script>
         // Establishing connection with server
         var socket = io.connect();
 
         // Changes the motor state/led state 
-        function changeState(state) {
+        function changeMotorDirection(state) {
             if (state == 1) {
                 // Emit message changing the state to 1
-                socket.emit('changeState', '{"state":1}');
+                socket.emit('changeMotorDirection', '{"state":1}');
                 // Change motor status on web page to FORWARD
                 document.getElementById("outputStatus").innerHTML = "Status: FORWARD";
             }
             else if (state == 2) {
                 // Emit message changing the state to 2
-                socket.emit('changeState', '{"state":2}');
+                socket.emit('changeMotorDirection', '{"state":2}');
                 // Change motor status on web page to Reverse
                 document.getElementById("outputStatus").innerHTML = "Status: REVERSE";
             }
             else if (state == 0) {
                 // Emit message changing the state to 0
-                socket.emit('changeState', '{"state":0}');
+                socket.emit('changeMotorDirection', '{"state":0}');
                 // Change motor status on web page to IDLE
                 document.getElementById("outputStatus").innerHTML = "Status: IDLE";
             }
             
-            if (state == 3) {
-                // Emit message changing the state to 3
-                socket.emit('changeState', '{"state":3}');
-                // Change led status to on 
-                document.getElementById("lights").innerHTML = "LED Status: ON";
-            }
-            else if (state == 4) {
-                // Emit message changing the state to 4
-                socket.emit('changeState', '{"state":4}');
-                // Change led status to off
-                document.getElementById("lights").innerHTML = "LED Status: OFF";
-            }
+            
         }
         
         window.addEventListener("keydown", handleKeyPressed, false);
@@ -51,19 +39,34 @@
             
             //FORWARD
             if (event.keyCode == 38) { //the number 38 is the keycode for the up arrow key 
-                changeState(1);
+                changeMotorDirection(1);
                 //add code to make motor go forward 
             }
             
             //REVERSE 
             else if (event.keyCode == 40) { //40 is the down arrow key 
-                changeState(2);
+                changeMotorDirection(2);
                 //add code to reverse motor 
             }
         }
         
         function handleKeyReleased(event) {
-            changeState(0);
+            changeMotorDirection(0);
+        }
+        
+        function changeLEDs(state) {
+            if (state == 0) {
+                // Emit message changing the state to 0
+                socket.emit('changeLEDs', '{"state":0}');
+                // Change led status to on 
+                document.getElementById("lights").innerHTML = "LED Status: OFF";
+            }
+            else if (state == 1) {
+                // Emit message changing the state to 4
+                socket.emit('changeLEDs', '{"state":1}');
+                // Change led status to off
+                document.getElementById("lights").innerHTML = "LED Status: ON";
+            }
         }
         
         function handleRadioButtons(speed) {
@@ -74,6 +77,7 @@
         
         //default motor speed init of 1 
         handleRadioButtons(1);
+        
  
     </script>
     
@@ -83,24 +87,11 @@
     <p id="outputStatus">Status</p>
     <p id="lights">LED Status</p>
     <p id="speed">Motor Speed</p>
-    <button type="button" onclick="changeState(3);">ON</button>
-    <button type="button" onclick="changeState(4);">OFF</button>
-
-<!--
-<div class="range-slider vertical-range" data-slider data-options="step: 1; vertical: true; start: 1; end: 7;">
-  <span class="range-slider-handle" role="slider" tabindex="0" aria-label="motorSpeeds"></span>
-  <span class="range-slider-active-segment"></span>
-  <input type="hidden">
-</div> -->
-
+    <button type="button" onclick="changeLEDs(1);">ON</button>
+    <button type="button" onclick="changeLEDs(0);">OFF</button>
 
 
 <body>
-  <!--
-  <script src="/js/vendor/jquery.js"></script>
-  <script src="/js/vendor/fastclick.js"></script>
-  <script src="/js/foundation.min.js"></script> 
-  -->
   
   <form>
     <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
