@@ -76,6 +76,15 @@ float pitch_stabilization(int16_t pitch_angle);
 /* Calculate Thrust Based on User Commands */
 float lateral_thrust(int positive, int negative, int speed);
 
+/* Convert Radians to Degrees */
+float rad_to_deg(float rad);
+
+/* Convert Degrees to Radians */
+float deg_to_rad(float deg);
+
+/* Calculates Pitch Motor Thrust for Vertical Stabilization */
+float buoy_compensation();
+
 /* Calculate Desired Thrust and PWM Values */
 void motor_calculation(User_Commands user_commands);
 

@@ -119,11 +119,36 @@ float lateral_thrust(int positive, int negative, int speed) {
   return thrust;
 }
 
+/* Convert Radians to Degrees */
+float rad_to_deg(float rad) {
+  return rad * 180.0f / M_PI;
+}
+
+/* Convert Degrees to Radians */
+float deg_to_rad(float deg) {
+  return (deg * M_PI) / 180.0f;
+}
+
+/* Calculates Pitch Motor Thrust for Vertical Stabilization */
+float buoy_compensation() {
+  float thrust, theta, compensation;
+
+  theta = (float)eul_angles[1] / ANGLE_SCALE;
+  theta = deg_to_rad(theta);
+
+  compensation = (tan(theta) * sin(theta) + cos(theta));
+  compensation = rad_to_deg(compensation);
+
+  thrust = (BUOY / compensation) / 2.0f;
+
+  return thrust;
+}
+
 /* Calculate Desired Thrust and PWM Values */
 void motor_calculation(User_Commands user_commands) {
   float m1, m2, m3, m4, m5, m6;
   float surge_thrust, sway_thrust, heave_thrust;
-  float depth_ref = BUOY * sin((float)eul_angles[1] / ANGLE_SCALE) / (float)2;
+  float depth_ref = buoy_compensation();
   float pitch_correction, pitch_angle;
   int speed = user_commands.speed;
 
@@ -133,7 +158,7 @@ void motor_calculation(User_Commands user_commands) {
 
   /* Heave */
   if (user_commands.up) {
-    heave_thrust = -(MAX_USER_THRUST - depth_ref);
+    heave_thrust = -MAX_USER_THRUST;
   }
   else if (user_commands.down) {
     heave_thrust = MAX_USER_THRUST - depth_ref;
