@@ -1,15 +1,21 @@
 #include "Motors.h"
 
 volatile Motors motor_values;
+Servo escP1;
+Servo escP2;
+Servo escY1;
+Servo escY2;
+Servo escR1;
+Servo escR2;
 
 /* Convert Thrust Values to PWM */
 int thrust_to_pwm(float thrust) {
   int pwm = ZERO_THRUST;
 
-  if (thrust > MIN_THRUST) {
+  if (thrust > MIN_THRUST_ABS) {
     pwm = FWD_SLOPE * thrust + FWD_OFFSET;
   }
-  else if (thrust < -MIN_THRUST) {
+  else if (thrust < -MIN_THRUST_ABS) {
     pwm = REV_SLOPE * thrust + REV_OFFSET;
   }
 
@@ -90,7 +96,7 @@ float speed_to_thrust(int speed) {
 }
 
 /* Calculates Compensation for Pitch */
-float pitch_stabilization(int16_t pitch_angle) {
+float pitch_stabilization(float m1, float m2, int16_t pitch_angle) {
   float thrust;
 
   thrust = 0.5 * (m1 + m2) * tan((float)eul_angles[1] / ANGLE_SCALE);
@@ -122,8 +128,8 @@ void motor_calculation(User_Commands user_commands) {
   int speed = user_commands.speed;
 
   /* Calculate Thrust Based on User Commands */
-  surge_thrust = lateral_thrust(user_commands.forward, user_commands.backward);
-  sway_thrust = lateral_thrust(user_commands.right, user_commands.left);
+  surge_thrust = lateral_thrust(user_commands.forward, user_commands.backward, speed);
+  sway_thrust = lateral_thrust(user_commands.right, user_commands.left, speed);
 
   /* Heave */
   if (user_commands.up) {
@@ -140,7 +146,7 @@ void motor_calculation(User_Commands user_commands) {
   m1 = depth_ref + heave_thrust - pid_output.pitch_corr; // NEED DEPTH CALCULATION
   m2 = depth_ref + heave_thrust + pid_output.pitch_corr; // NEED DEPTH CALCULATION
 
-  pitch_correction = pitch_stabilization(eul_angles[1]);
+  pitch_correction = pitch_stabilization(m1, m2, eul_angles[1]);
 
   m3 = surge_thrust + pid_output.yaw_corr - pitch_correction;
   m4 = surge_thrust - pid_output.yaw_corr - pitch_correction;

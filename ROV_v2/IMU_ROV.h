@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 
 #define BNO055_CHIP_ID          0x00    // should be 0xA0
 #define BNO055_ACC_ID           0x01    // should be 0xFB

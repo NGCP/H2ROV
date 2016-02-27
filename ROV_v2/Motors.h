@@ -62,7 +62,7 @@ int thrust_to_pwm(float thrust);
 void init_motors();
 
 /* Verifies PWM is Within Range */
-void verify_pwm(int pwm);
+int verify_pwm(int pwm);
 
 /* Verifies Thrust is Within Range */
 float verify_thrust(float thrust);
@@ -77,7 +77,7 @@ float pitch_stabilization(int16_t pitch_angle);
 float lateral_thrust(int positive, int negative, int speed);
 
 /* Calculate Desired Thrust and PWM Values */
-void motor_calculation();
+void motor_calculation(User_Commands user_commands);
 
 /* Send PWM Values to ESCs */
 void set_motor_speed();

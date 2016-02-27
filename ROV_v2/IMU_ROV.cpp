@@ -1,5 +1,4 @@
 #include "IMU_ROV.h"
-#include <Wire.h>
 
 // Set initial input parameters
 enum Ascale {  // ACC Full Scale
