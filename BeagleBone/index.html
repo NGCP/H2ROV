@@ -29,7 +29,57 @@
                 document.getElementById("outputStatus").innerHTML = "Status: IDLE";
             }
             
+            if (state == 3) {
+                // Emit message changing the state to 3
+                socket.emit('changeMotorDirection', '{"state":3}');
+                // Change motor status on web page to YAW LEFT
+                document.getElementById("outputStatus").innerHTML = "Status: YAW LEFT";
+            }
+            else if (state == 4) {
+                // Emit message changing the state to 4
+                socket.emit('changeMotorDirection', '{"state":4}');
+                // Change motor status on web page to YAW RIGHT
+                document.getElementById("outputStatus").innerHTML = "Status: YAW RIGHT";
+            }
             
+            if (state == 5) {
+                // Emit message changing the state to 5
+                socket.emit('changeMotorDirection', '{"state":5}');
+                // Change motor status on web page to ASCEND
+                document.getElementById("outputStatus").innerHTML = "Status: ASCEND";
+            }
+            else if (state == 6) {
+                // Emit message changing the state to 6
+                socket.emit('changeMotorDirection', '{"state":6}');
+                // Change motor status on web page to SUBMERGE
+                document.getElementById("outputStatus").innerHTML = "Status: SUBMERGE";
+            }
+            
+            if (state == 7) {
+                // Emit message changing the state to 7
+                socket.emit('changeMotorDirection', '{"state":7}');
+                // Change motor status on web page to PITCH UP
+                document.getElementById("outputStatus").innerHTML = "Status: PITCH UP";
+            }
+            else if (state == 8) {
+                // Emit message changing the state to 8
+                socket.emit('changeMotorDirection', '{"state":8}');
+                // Change motor status on web page to PITCH DOWN
+                document.getElementById("outputStatus").innerHTML = "Status: PITCH DOWN";
+            }
+            
+            if (state == 9) {
+                // Emit message changing the state to 9
+                socket.emit('changeMotorDirection', '{"state":9}');
+                // Change motor status on web page to STRAFE LEFT
+                document.getElementById("outputStatus").innerHTML = "Status: STRAFE LEFT";
+            }
+            else if (state == 10) {
+                // Emit message changing the state to 10
+                socket.emit('changeMotorDirection', '{"state":10}');
+                // Change motor status on web page to STRAFE RIGHT
+                document.getElementById("outputStatus").innerHTML = "Status: STRAFE RIGHT";
+            }
         }
         
         window.addEventListener("keydown", handleKeyPressed, false);
@@ -38,20 +88,61 @@
         function handleKeyPressed(event) {
             
             //FORWARD
-            if (event.keyCode == 38) { //the number 38 is the keycode for the up arrow key 
+            if (event.keyCode == 38) { //up arrow key 
                 changeMotorDirection(1);
-                //add code to make motor go forward 
             }
             
             //REVERSE 
-            else if (event.keyCode == 40) { //40 is the down arrow key 
+            else if (event.keyCode == 40) { //down arrow key 
                 changeMotorDirection(2);
-                //add code to reverse motor 
+            }
+            
+            //YAW LEFT
+            if (event.keyCode == 37) { //left arrow key 
+                changeMotorDirection(3);
+            }
+            
+            //YAW RIGHT
+            else if (event.keyCode == 39) { //right arrow key 
+                changeMotorDirection(4); 
+            }
+            
+            //ASCEND 
+            if (event.keyCode == 32) { //spacebar key 
+                changeMotorDirection(5);
+            }
+            
+            /* Need to discuss what key we should use for this.  Shift doesn't record continuous presses when you hold it.
+             * Only will register 1 press which is not what we want when the ROV is diving/submerging  
+             */
+            //SUBMERGE
+            else if (event.keyCode == 16) { //shift key  
+                changeMotorDirection(6);
+            }
+            
+            //PITCH UP
+            if (event.keyCode == 87) { //"w" key  
+                changeMotorDirection(7); 
+            }
+            
+            //PITCH DOWN
+            else if (event.keyCode == 83) { //"s" key 
+                changeMotorDirection(8);
+            }
+            
+            //STRAFE LEFT
+            if (event.keyCode == 65) { //"a" key 
+                changeMotorDirection(9);
+            }
+            
+            //STRAFE RIGHT
+            else if (event.keyCode == 68) { //"d" key 
+                changeMotorDirection(10);
             }
         }
         
         function handleKeyReleased(event) {
-            changeMotorDirection(0);
+            changeMotorDirection(0); //no motor keys being pressed 
         }
         
         function changeLEDs(state) {
@@ -75,10 +166,16 @@
         }
 
         
-        //default motor speed init of 1 
-        handleRadioButtons(1);
+        function initROV() {
+           //default motor speed init of 1 
+           handleRadioButtons(1);
         
- 
+           //default LED setting set to "off" position
+           changeLEDs(0);
+        
+           //default motor direction initialize to IDLE 
+           changeMotorDirection(0);
+        }
     </script>
     
 </head>
@@ -91,7 +188,7 @@
     <button type="button" onclick="changeLEDs(0);">OFF</button>
 
 
-<body>
+<body onload="initROV()">
   
   <form>
     <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
