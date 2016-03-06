@@ -3,6 +3,7 @@
 <head>
     <title>H2ROV GROUND CONTROL STATION INTERFACE</title>
     <script src = "/socket.io/socket.io.js" ></script>
+    <link rel="stylesheet" type="text/css" href="css/controlstation.css">
     
     <script>
         // Establishing connection with server
@@ -150,13 +151,13 @@
                 // Emit message changing the state to 0
                 socket.emit('changeLEDs', '{"state":0}');
                 // Change led status to on 
-                document.getElementById("lights").innerHTML = "LED Status: OFF";
+                document.getElementById("lights").innerHTML = "Lights Status: OFF";
             }
             else if (state == 1) {
                 // Emit message changing the state to 4
                 socket.emit('changeLEDs', '{"state":1}');
                 // Change led status to off
-                document.getElementById("lights").innerHTML = "LED Status: ON";
+                document.getElementById("lights").innerHTML = "Lights Status: ON";
             }
         }
         
@@ -180,27 +181,36 @@
     
 </head>
 
-    <h2>H2ROV GROUND CONTROL STATION INTERFACE</h2>
-    <p id="outputStatus">Status</p>
-    <p id="lights">LED Status</p>
-    <p id="speed">Motor Speed</p>
-    <button type="button" onclick="changeLEDs(1);">ON</button>
-    <button type="button" onclick="changeLEDs(0);">OFF</button>
-
-
 <body onload="initROV()">
-  
-  <form>
-    <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
-    <input type="radio" name="speed" value="2" onclick = "handleRadioButtons(2)"> 2<br>
-    <input type="radio" name="speed" value="3" onclick = "handleRadioButtons(3)"> 3<br>  
-    <input type="radio" name="speed" value="4" onclick = "handleRadioButtons(4)"> 4<br>  
-    <input type="radio" name="speed" value="5" onclick = "handleRadioButtons(5)"> 5<br>  
-    <input type="radio" name="speed" value="6" onclick = "handleRadioButtons(6)"> 6<br>  
-    <input type="radio" name="speed" value="7" onclick = "handleRadioButtons(7)"> 7<br>  
-  </form> 
-  
-  
+    <div style="margin: 30px">
+        <h1 align="center" class="shadow">ROV CONTROL STATION</h1>
+        <table>
+            <tr>
+                <td style="padding: 10px" width="70%">
+                    <img src="img/SeaFloor.jpg" style="width: 100%;">
+                </td>
+
+                <td style="padding: 10px" width="30%" align="left" valign="top">
+                    <p id="outputStatus">Vehicle Status: IDLE</p>
+                    <br>
+                    <p id="lights" style="margin: 0 0 0px;">Lights Status: OFF</p>
+                    <button type="button" onclick="changeLEDs(1);">ON</button>
+                    <button type="button" onclick="changeLEDs(0);">OFF</button>
+                    <p id="speed">Motor Speed: 0</p>
+                    
+                    <form>
+                        <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
+                        <input type="radio" name="speed" value="2" onclick = "handleRadioButtons(2)"> 2<br>
+                        <input type="radio" name="speed" value="3" onclick = "handleRadioButtons(3)"> 3<br>  
+                        <input type="radio" name="speed" value="4" onclick = "handleRadioButtons(4)"> 4<br>  
+                        <input type="radio" name="speed" value="5" onclick = "handleRadioButtons(5)"> 5<br>  
+                        <input type="radio" name="speed" value="6" onclick = "handleRadioButtons(6)"> 6<br>  
+                        <input type="radio" name="speed" value="7" onclick = "handleRadioButtons(7)"> 7<br>  
+                    </form> 
+                </td>
+            </tr>
+        </table>
+    </div>
   
 </body>
 </html>
