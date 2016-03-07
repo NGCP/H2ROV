@@ -74,7 +74,7 @@ float verify_thrust(float thrust) {
   else if (thrust > MAX_THRUST_ABS) {
     output = MAX_THRUST_ABS;
   }
-  else if (thrust < MIN_THRUST_ABS || thrust > -MIN_THRUST_ABS) {
+  else if (thrust < MIN_THRUST_ABS && thrust > -MIN_THRUST_ABS) {
     output = 0;
   }
 
@@ -82,11 +82,11 @@ float verify_thrust(float thrust) {
 }
 
 /* Converts User Speed to Thrust */
-float speed_to_thrust(int speed) {
+float speed_to_thrust(int user_speed) {
   float thrust;
 
-  if (speed < MAX_SPEED && speed > MIN_SPEED) {
-    thrust = speed * (MAX_USER_THRUST / NUM_SPEEDS);
+  if (user_speed <= MAX_SPEED && user_speed >= MIN_SPEED) {
+    thrust = user_speed * (MAX_USER_THRUST / (float)NUM_SPEEDS);
   }
   else {
     thrust = 0;
@@ -103,14 +103,14 @@ float pitch_stabilization(float m1, float m2, int16_t pitch_angle) {
 }
 
 /* Calculate Thrust Based on User Commands */
-float lateral_thrust(int positive, int negative, int speed) {
+float lateral_thrust(int positive, int negative, int user_speed) {
   float thrust;
 
   if (positive) {
-    thrust = speed_to_thrust(speed);
+    thrust = speed_to_thrust(user_speed);
   }
   else if (negative) {
-    thrust = -speed_to_thrust(speed);
+    thrust = -speed_to_thrust(user_speed);
   }
   else {
     thrust = 0;
@@ -150,11 +150,12 @@ void motor_calculation(User_Commands user_commands) {
   float surge_thrust, sway_thrust, heave_thrust;
   float depth_ref = buoy_compensation();
   float pitch_correction, pitch_angle;
-  int speed = user_commands.speed;
+  int user_speed = user_commands.user_speed;
 
   /* Calculate Thrust Based on User Commands */
-  surge_thrust = lateral_thrust(user_commands.forward, user_commands.backward, speed);
-  sway_thrust = lateral_thrust(user_commands.right, user_commands.left, speed);
+  surge_thrust = lateral_thrust(user_commands.forward, user_commands.backward, user_speed);
+  //Serial.println(surge_thrust);
+  sway_thrust = lateral_thrust(user_commands.right, user_commands.left, user_speed);
 
   /* Heave */
   if (user_commands.up) {
@@ -203,4 +204,17 @@ void set_motor_speed() {
   escY2.writeMicroseconds(motor_values.m4_pwm);
   escR1.writeMicroseconds(motor_values.m5_pwm);
   escR2.writeMicroseconds(motor_values.m6_pwm);
+  
+  Serial.print(motor_values.m1_pwm);
+  Serial.print("   ");
+  Serial.print(motor_values.m2_pwm);
+  Serial.print("   ");
+  Serial.print(motor_values.m3_pwm);
+  Serial.print("   ");
+  Serial.print(motor_values.m4_pwm);
+  Serial.print("   ");
+  Serial.print(motor_values.m5_pwm);
+  Serial.print("   ");
+  Serial.print(motor_values.m6_pwm);
+  Serial.println();
 }

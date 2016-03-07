@@ -19,22 +19,20 @@ void setup() {
 
 /* Main Loop */
 void loop() {
-  if (Serial1.available() >= 4) {
-    command.parse_command();
-    user_commands = command.get_user_commands();
-    Serial.print("Forward: ");
-    Serial.print(user_commands.forward);
-    Serial.print("   ");
-    Serial.print("Reverse: ");
-    Serial.print(user_commands.backward);
-    Serial.print("   ");
-    Serial.print("Left: ");
-    Serial.print(user_commands.left);
-    Serial.print("   ");
-    Serial.print("Right: ");
-    Serial.print(user_commands.right);
-    Serial.println();
-  }
+  command.parse_command();
+  user_commands = command.get_user_commands();
+//  Serial.print("Forward: ");
+//  Serial.print(user_commands.forward);
+//  Serial.print("   ");
+//  Serial.print("Reverse: ");
+//  Serial.print(user_commands.backward);
+//  Serial.print("   ");
+//  Serial.print("Left: ");
+//  Serial.print(user_commands.left);
+//  Serial.print("   ");
+//  Serial.print("Right: ");
+//  Serial.print(user_commands.right);
+//  Serial.println();
 
   /* Calculate Setpoint */
   
@@ -45,5 +43,8 @@ void loop() {
   //pid_calculate();
 
   /* Motor Calculation */
-  //motor_calculation(user_commands);
+  motor_calculation(user_commands);
+  
+  /* Actuate Motors */
+  set_motor_speed();
 }
