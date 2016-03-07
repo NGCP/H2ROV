@@ -2,7 +2,7 @@
 
 /* Default Constructor */
 Command::Command() {
-  Serial1.begin(9600);
+  Serial1.begin(115200);
 
   command = 0;
   memset(&user_commands, 0, sizeof(User_Commands));
@@ -64,7 +64,12 @@ void Command::parse_motor() {
 
 /* Parses Command Vector */
 bool Command::parse_command() {
-  command = Serial1.read();
+  byte data[4];
+  Serial1.readBytes(data, 4);
+  
+  command = 0;
+  command |= (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+  //Serial.println(command, BIN);
 
   if (!check_parity()) {
     return false;
