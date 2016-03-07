@@ -97,9 +97,14 @@ float speed_to_thrust(int user_speed) {
 
 /* Calculates Compensation for Pitch */
 float pitch_stabilization(float m1, float m2, int16_t pitch_angle) {
-  float thrust;
+  float thrust, theta;
+  
+  theta = (float)pitch_angle / ANGLE_SCALE;
+  theta = deg_to_rad(theta);
 
-  thrust = 0.5 * (m1 + m2) * tan((float)eul_angles[1] / ANGLE_SCALE);
+  thrust = 0.5 * (m1 + m2) * tan(theta);
+  
+  return thrust;
 }
 
 /* Calculate Thrust Based on User Commands */
@@ -133,11 +138,10 @@ float deg_to_rad(float deg) {
 float buoy_compensation() {
   float thrust, theta, compensation;
 
-  theta = (float)eul_angles[1] / ANGLE_SCALE;
+  theta = (float)eul_angles[PITCH_DATA] / ANGLE_SCALE;
   theta = deg_to_rad(theta);
 
   compensation = (tan(theta) * sin(theta) + cos(theta));
-  compensation = rad_to_deg(compensation);
 
   thrust = (BUOY / compensation) / 2.0f;
 
@@ -170,9 +174,9 @@ void motor_calculation(User_Commands user_commands) {
 
   /* Calculate Thrust Values */
   m1 = depth_ref + heave_thrust - pid_output.pitch_corr; // NEED DEPTH CALCULATION
-  m2 = depth_ref + heave_thrust + pid_output.pitch_corr; // NEED DEPTH CALCULATION
+  m2 = depth_ref + heave_thrust + pid_output.pitch_corr; // NEED DEPTH CALCULATIONs
 
-  pitch_correction = pitch_stabilization(m1, m2, eul_angles[1]);
+  pitch_correction = pitch_stabilization(m1, m2, eul_angles[PITCH_DATA]);
 
   m3 = surge_thrust + pid_output.yaw_corr - pitch_correction;
   m4 = surge_thrust - pid_output.yaw_corr - pitch_correction;

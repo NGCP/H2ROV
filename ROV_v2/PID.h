@@ -2,22 +2,33 @@
 #define PID_H
 
 #include "Motors.h"
+#include "Command.h"
+#include "IMU_ROV.h"
 
 /* PID Parameters */
-#define KP_ROLL 1
+#define KP_ROLL 5
 #define KI_ROLL 1
 #define KD_ROLL 1
 
-#define KP_PITCH 1
+#define KP_PITCH 5
 #define KI_PITCH 1
 #define KD_PITCH 1
 
-#define KP_YAW 1
+#define KP_YAW 5
 #define KI_YAW 1
 #define KD_YAW 1
 
 #define PID_MAX 5760
 #define ANGLE_SCALE 16.0f
+
+#define PITCH_SET 720
+#define YAW_SET 32
+#define YAW_LIMIT 2880
+#define YAW_MAX 5760
+
+#define YAW_DATA 0
+#define ROLL_DATA 1
+#define PITCH_DATA 2
 
 /* Angular Setpoints */
 typedef struct Setpoints {
@@ -42,16 +53,23 @@ typedef struct PID_Out {
 }PID_Out;
 
 extern volatile PID_Out pid_output;
+extern volatile Setpoints setpoints;
 extern volatile Errors errors;
 extern volatile int16_t eul_angles[3];
-
-//Setpoints calc_setpoint();
-//Errors calc_error();
 
 /* Initialize PID Controller */
 void init_pid();
 
+/* Calculates Roll, Pitch, and Yaw Setpoints */
+void calculate_setpoints(User_Commands user_commands);
+
+/* Calculate Angular Errors */
+void calculate_errors();
+
+/* Convert Correction Values to Thrust */
+float pid_to_thrust(float pid_value);
+
 /* Calculate Correction Values */
-void pid_calculate();
+void pid_calculate(User_Commands user_commands);
 
 #endif

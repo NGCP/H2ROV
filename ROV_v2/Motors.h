@@ -35,7 +35,7 @@
 #define NUM_SPEEDS 7
 
 /* Physical Considerations */
-#define BUOY 3.0f
+#define BUOY 0.0f
 #define MAX_PITCH 45
 
 typedef struct Motors {

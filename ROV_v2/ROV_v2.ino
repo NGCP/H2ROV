@@ -9,18 +9,23 @@ User_Commands user_commands;
 
 /* Initialization */
 void setup() {
-  init_pid();
   init_motors();
   IMU_setup();
+  _delay_ms(1000);
+  init_pid();
   Serial.begin(115200);
-
-  /* Calibrate IMU? */
 }
 
 /* Main Loop */
 void loop() {
+  /* Get User Commands */
   command.parse_command();
   user_commands = command.get_user_commands();
+  
+  //user_commands = 0;
+  
+  //Serial.println(user_commands.user_speed);
+  
 //  Serial.print("Forward: ");
 //  Serial.print(user_commands.forward);
 //  Serial.print("   ");
@@ -34,13 +39,8 @@ void loop() {
 //  Serial.print(user_commands.right);
 //  Serial.println();
 
-  /* Calculate Setpoint */
-  
-
-  /* Calculate Error */
-
   /* PID Correction */
-  //pid_calculate();
+  pid_calculate(user_commands);
 
   /* Motor Calculation */
   motor_calculation(user_commands);
