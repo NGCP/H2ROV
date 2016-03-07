@@ -284,11 +284,11 @@ function send_command() {
    command3 |= (command >> 8) & 0xFF;
    command4 |= (command) & 0xFF;
 
-   console.log("Command " + bin(command));
-   console.log("Command1 " + bin(command1));
-   console.log("Command2 " + bin(command2));
-   console.log("Command3 " + bin(command3));
-   console.log("Command4 " + bin(command4));
+   //console.log("Command " + bin(command));
+   //console.log("Command1 " + bin(command1));
+   //console.log("Command2 " + bin(command2));
+   //console.log("Command3 " + bin(command3));
+   //console.log("Command4 " + bin(command4));
    b.serialWrite(port, [command1]);
    b.serialWrite(port, [command2]);
    b.serialWrite(port, [command3]);
