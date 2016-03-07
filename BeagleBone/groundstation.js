@@ -103,12 +103,12 @@ function handleMotorChange(data) {
     }
     
     if (newData.state == '3') {
-        set_motor('yaw left');  
-        console.log("MOTOR = YAW LEFT");
+        set_motor('left');  
+        console.log("MOTOR = STRAFE LEFT");
     }
     else if (newData.state == '4') {
-        set_motor('yaw right');
-        console.log("MOTOR = YAW RIGHT");
+        set_motor('right');
+        console.log("MOTOR = STRAFE RIGHT");
     }
     
     if (newData.state == '5') { //ascend        
@@ -130,12 +130,12 @@ function handleMotorChange(data) {
     }
     
     if (newData.state == '9') {       
-        set_motor('left');
-        console.log("MOTOR = STRAFE LEFT/LEFT");
+        set_motor('yaw left');
+        console.log("MOTOR = YAW LEFT");
     }
     else if (newData.state == '10') { 
-        set_motor('right');
-        console.log("MOTOR = STRAFE RIGHT/RIGHT");
+        set_motor('yaw right');
+        console.log("MOTOR = YAW RIGHT");
     }
     
     
