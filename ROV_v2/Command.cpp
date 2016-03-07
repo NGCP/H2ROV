@@ -45,7 +45,7 @@ void Command::parse_light() {
 
 /* Checks Speed Bits */
 void Command::parse_speed() {
-  user_commands.speed = (command >> SPEED_SHIFT) & SPEED_MASK;
+  user_commands.user_speed = (command >> SPEED_SHIFT) & SPEED_MASK;
 }
 
 /* Parses User Motion Data */
@@ -65,11 +65,17 @@ void Command::parse_motor() {
 /* Parses Command Vector */
 bool Command::parse_command() {
   byte data[4];
-  Serial1.readBytes(data, 4);
   
-  command = 0;
-  command |= (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-  //Serial.println(command, BIN);
+  /* Initialize Data to Zero */
+  for (int i = 0; i < 4; i++) {
+    data[i] = 0;
+  }
+  
+  if (Serial1.available() >= 4) {
+    Serial1.readBytes(data, 4);
+    command = 0;
+    command |= (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+  }
 
   if (!check_parity()) {
     return false;

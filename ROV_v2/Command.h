@@ -36,7 +36,7 @@ typedef struct User_Commands {
   bool pitch_down;
   bool yaw_right;
   bool yaw_left;
-  int speed;
+  int user_speed;
 } User_Commands;
 
 /* User Command Class */
