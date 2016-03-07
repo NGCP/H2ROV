@@ -276,13 +276,19 @@ function bin(dec){
 }
 
 function send_command() { 
+   var command1 = 0, command2 = 0, command3 = 0, command4 = 0;
    set_parity();
 
-   //b.serialWrite(port, [0X11]);
-   //b.serialWrite(port, [0X11]);
-   //b.serialWrite(port, [0X11]);
+   command1 |= (command >> 24) & 0xFF;
+   command2 |= (command >> 16) & 0xFF;
+   command3 |= (command >> 8) & 0xFF;
+   command4 |= (command) & 0xFF;
+
    console.log("Command " + bin(command));
-   b.serialWrite(port, command);
+   b.serialWrite(port, [command1]);
+   b.serialWrite(port, [command2]);
+   b.serialWrite(port, [command3]);
+   b.serialWrite(port, [command4]);
    
    clear_motor();
    console.log("SENT COMMAND BITCHES " + command);
