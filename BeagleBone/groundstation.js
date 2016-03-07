@@ -84,7 +84,7 @@ function handleMotorChange(data) {
     //console.log("MOTOR = " + newData.state);
     
     // turns the motor forward (1), backward (2),  
-	if (newData.state == '1') {
+	  if (newData.state == '1') {
         //b.serialWrite(port, [0x01]);
         //cmd.set_motor('forward');
         set_motor('forward');
@@ -274,7 +274,7 @@ function send_command() {
    set_parity();
    b.serialWrite(port, [command]);
    clear_motor();
-   //console.log("SENT COMMAND BITCHES " + command);
+   console.log("SENT COMMAND BITCHES " + command);
    //b.serialWrite(port, 1);
 }
 
