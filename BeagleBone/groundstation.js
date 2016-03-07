@@ -285,14 +285,17 @@ function send_command() {
    command4 |= (command) & 0xFF;
 
    console.log("Command " + bin(command));
+   console.log("Command1 " + bin(command1));
+   console.log("Command2 " + bin(command2));
+   console.log("Command3 " + bin(command3));
+   console.log("Command4 " + bin(command4));
    b.serialWrite(port, [command1]);
    b.serialWrite(port, [command2]);
    b.serialWrite(port, [command3]);
    b.serialWrite(port, [command4]);
    
    clear_motor();
-   console.log("SENT COMMAND BITCHES " + command);
-   //b.serialWrite(port, 1);
+   //console.log("SENT COMMAND BITCHES " + command);
 }
 
 function clear_command() {
