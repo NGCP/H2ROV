@@ -29,7 +29,7 @@ var command = 0;
 
 var port = '/dev/ttyO2';
 var options = {
-    baudrate: 9600
+    baudrate: 115200
 };
 
 // Create a variable called key, which refers to P9_14
@@ -45,10 +45,11 @@ var server = http.createServer(function (req, res) {
     var fileExtension = path.extname(file);
     var contentType = 'text/html';
     // Uncoment if you want to add css to your web page
-    /*
+    
     if(fileExtension == '.css'){
         contentType = 'text/css';
-    }*/
+    }
+    
     fs.exists(file, function(exists){
         if(exists){
             fs.readFile(file, function(error, content){
@@ -84,7 +85,7 @@ function handleMotorChange(data) {
     //console.log("MOTOR = " + newData.state);
     
     // turns the motor forward (1), backward (2),  
-	  if (newData.state == '1') {
+	if (newData.state == '1') {
         //b.serialWrite(port, [0x01]);
         //cmd.set_motor('forward');
         set_motor('forward');
@@ -270,9 +271,19 @@ function clear_motor() {
    }
 }
 
+function bin(dec){
+    return (dec >>> 0).toString(2);
+}
+
 function send_command() { 
    set_parity();
-   b.serialWrite(port, [command]);
+
+   //b.serialWrite(port, [0X11]);
+   //b.serialWrite(port, [0X11]);
+   //b.serialWrite(port, [0X11]);
+   console.log("Command " + bin(command));
+   b.serialWrite(port, command);
+   
    clear_motor();
    console.log("SENT COMMAND BITCHES " + command);
    //b.serialWrite(port, 1);
