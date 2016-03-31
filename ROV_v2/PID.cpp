@@ -5,6 +5,8 @@ volatile Setpoints setpoints = {0, 0, 0};
 volatile Setpoints ref_sp = {0, 0, 0};
 volatile Errors errors = {0, 0, 0};
 volatile int16_t eul_angles[3] = {0, 0, 0};
+volatile int16_t prev_angles[3] = {0, 0, 0};
+volatile int16_t error_sum[3] = {0, 0, 0};
 
 /* Initialize PID Controller */
 void init_pid() {
@@ -12,6 +14,11 @@ void init_pid() {
   
   /* Read Initial IMU Data */
   readEulData(imu_data);
+
+  /* Save IMU Data */
+  for (int i = 0; i < 3; i++) {
+    eul_angles[i] = imu_data[i];
+  }
   
   /* Calibrate IMU */
   ref_sp.roll_sp = imu_data[ROLL_DATA];
@@ -28,7 +35,12 @@ void calculate_setpoints(User_Commands user_commands) {
   /* Read IMU Data */
   readEulData(imu_data);
   
-  /* Save IMU Data */
+  /* Save Previous IMU Data */
+  for (int i = 0; i < 3; i++) {
+    prev_angles[i] = eul_angles[i];
+  }
+
+  /* Save New IMU Data */
   for (int i = 0; i < 3; i++) {
     eul_angles[i] = imu_data[i];
   }
@@ -64,14 +76,32 @@ void calculate_setpoints(User_Commands user_commands) {
   }
 }
 
+/* Thresholds Integral Error Sum */
+int16_t threshold_integral_error(int16_t error) {
+  int16_t output = error;
+
+  if (error > INTEGRAL_MAX) {
+    output = INTEGRAL_MAX;
+  }
+  else if (error < -INTEGRAL_MAX) {
+    output = -INTEGRAL_MAX;
+  }
+
+  return output;
+}
+
 /* Calculate Angular Errors */
 void calculate_errors() {
   
   /* Roll Error Calculation */
   errors.roll_err = setpoints.roll_sp - eul_angles[ROLL_DATA];
+  error_sum[ROLL_DATA] += errors.roll_err;
+  error_sum[ROLL_DATA] = threshold_integral_error(error_sum[ROLL_DATA]);
   
   /* Pitch Error Calculation */
   errors.pitch_err = setpoints.pitch_sp - eul_angles[PITCH_DATA];
+  error_sum[PITCH_DATA] += errors.pitch_err;
+  error_sum[PITCH_DATA] = threshold_integral_error(error_sum[PITCH_DATA]);
   
   /* Yaw Error Calculation */
   errors.yaw_err = setpoints.yaw_sp - eul_angles[YAW_DATA];
@@ -97,12 +127,26 @@ float pid_to_thrust(float pid_value) {
 /* Calculate Correction Values */
 void pid_calculate(User_Commands user_commands) {
   float roll_pid, pitch_pid, yaw_pid;
+  float roll_deriv, pitch_deriv, yaw_deriv;
   
+  /* Proportional Calculations */
   calculate_setpoints(user_commands);
   calculate_errors();
 
-  roll_pid = KP_ROLL * errors.roll_err;
-  pitch_pid = KP_PITCH * errors.pitch_err;
+  /* Derivative Calculations */
+  roll_deriv = eul_angles[ROLL_DATA] - prev_angles[ROLL_DATA];
+  pitch_deriv = eul_angles[PITCH_DATA] - prev_angles[PITCH_DATA];
+
+  /* Roll PID Calculation */
+  roll_pid = KP_ROLL * errors.roll_err +
+             KI_ROLL * error_sum[ROLL_DATA] -
+             KD_ROLL * roll_deriv;
+
+  /* Pitch PID Calculation */
+  pitch_pid = KP_PITCH * errors.pitch_err +
+              KI_PITCH * error_sum[PITCH_DATA] -
+              KD_PITCH * pitch_deriv;
+
   yaw_pid = KP_YAW * errors.yaw_err;
   
 //  Serial.print(roll_pid);

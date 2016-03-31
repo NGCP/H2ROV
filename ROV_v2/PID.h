@@ -19,6 +19,7 @@
 #define KD_YAW 1
 
 #define PID_MAX 5760
+#define INTEGRAL_MAX 160
 #define ANGLE_SCALE 16.0f
 
 #define PITCH_SET 720
@@ -56,12 +57,17 @@ extern volatile PID_Out pid_output;
 extern volatile Setpoints setpoints;
 extern volatile Errors errors;
 extern volatile int16_t eul_angles[3];
+extern volatile int16_t prev_angles[3];
+extern volatile int16_t error_sum[3];
 
 /* Initialize PID Controller */
 void init_pid();
 
 /* Calculates Roll, Pitch, and Yaw Setpoints */
 void calculate_setpoints(User_Commands user_commands);
+
+/* Thresholds Integral Error Sum */
+int16_t threshold_integral_error(int16_t error);
 
 /* Calculate Angular Errors */
 void calculate_errors();
