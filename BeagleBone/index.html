@@ -6,144 +6,90 @@
     <link rel="stylesheet" type="text/css" href="css/controlstation.css">
     
     <script>
+        const down = 1;
+        const up = 2;
+        const backward = 3;
+        const forward = 4;
+        const right = 5;
+        const left = 6;
+        const pitch_up = 7;
+        const pitch_down = 8;
+        const yaw_right = 9;
+        const yaw_left = 10;
+        
+        const key_up_arrow = 38;
+        const key_down_arrow = 40;
+        const key_left_arrow = 37;
+        const key_right_arrow = 39;
+        const key_spacebar = 32;
+        const key_shift = 16;
+        const key_w = 87;
+        const key_s = 83;
+        const key_a = 65;
+        const key_d = 68;
+        
         // Establishing connection with server
         var socket = io.connect();
+        var keymap = [];
+        var key_dict = [];
+        var keyvector = 0;
 
-        // Changes the motor state/led state 
-        function changeMotorDirection(state) {
-            if (state == 1) {
-                // Emit message changing the state to 1
-                socket.emit('changeMotorDirection', '{"state":1}');
-                // Change motor status on web page to FORWARD
-                document.getElementById("outputStatus").innerHTML = "Status: FORWARD";
-            }
-            else if (state == 2) {
-                // Emit message changing the state to 2
-                socket.emit('changeMotorDirection', '{"state":2}');
-                // Change motor status on web page to Reverse
-                document.getElementById("outputStatus").innerHTML = "Status: REVERSE";
-            }
-            else if (state == 0) {
-                // Emit message changing the state to 0
-                socket.emit('changeMotorDirection', '{"state":0}');
-                // Change motor status on web page to IDLE
-                document.getElementById("outputStatus").innerHTML = "Status: IDLE";
-            }
-            
-            if (state == 3) {
-                // Emit message changing the state to 3
-                socket.emit('changeMotorDirection', '{"state":3}');
-                // Change motor status on web page to STRAFE LEFT
-                document.getElementById("outputStatus").innerHTML = "Status: STRAFE LEFT";
-            }
-            else if (state == 4) {
-                // Emit message changing the state to 4
-                socket.emit('changeMotorDirection', '{"state":4}');
-                // Change motor status on web page to STRAFE RIGHT
-                document.getElementById("outputStatus").innerHTML = "Status: STRAFE RIGHT";
-            }
-            
-            if (state == 5) {
-                // Emit message changing the state to 5
-                socket.emit('changeMotorDirection', '{"state":5}');
-                // Change motor status on web page to ASCEND
-                document.getElementById("outputStatus").innerHTML = "Status: ASCEND";
-            }
-            else if (state == 6) {
-                // Emit message changing the state to 6
-                socket.emit('changeMotorDirection', '{"state":6}');
-                // Change motor status on web page to SUBMERGE
-                document.getElementById("outputStatus").innerHTML = "Status: SUBMERGE";
-            }
-            
-            if (state == 7) {
-                // Emit message changing the state to 7
-                socket.emit('changeMotorDirection', '{"state":7}');
-                // Change motor status on web page to PITCH UP
-                document.getElementById("outputStatus").innerHTML = "Status: PITCH UP";
-            }
-            else if (state == 8) {
-                // Emit message changing the state to 8
-                socket.emit('changeMotorDirection', '{"state":8}');
-                // Change motor status on web page to PITCH DOWN
-                document.getElementById("outputStatus").innerHTML = "Status: PITCH DOWN";
-            }
-            
-            if (state == 9) {
-                // Emit message changing the state to 9
-                socket.emit('changeMotorDirection', '{"state":9}');
-                // Change motor status on web page to YAW LEFT
-                document.getElementById("outputStatus").innerHTML = "Status: YAW LEFT";
-            }
-            else if (state == 10) {
-                // Emit message changing the state to 10
-                socket.emit('changeMotorDirection', '{"state":10}');
-                // Change motor status on web page to YAW RIGHT
-                document.getElementById("outputStatus").innerHTML = "Status: YAW RIGHT";
-            }
+        function create_key_dict() {
+            key_dict[key_up_arrow] = forward;
+            key_dict[key_down_arrow] = backward;
+            key_dict[key_left_arrow] = left;
+            key_dict[key_right_arrow] = right;
+            key_dict[key_spacebar] = down;
+            key_dict[key_shift] = up;
+            key_dict[key_w] = pitch_up;
+            key_dict[key_s] = pitch_down;
+            key_dict[key_a] = yaw_left;
+            key_dict[key_d] = yaw_right;
         }
+        
+        create_key_dict();
         
         window.addEventListener("keydown", handleKeyPressed, false);
         window.addEventListener("keyup", handleKeyReleased, false);
         
+        /* Converts Decimal to Binary */
+        function bin(dec) {
+           return (dec >>> 0).toString(2);
+        }
+        
+        /* Sets Given Bit in Command Vector */
+        function set_bit(bitshift) {
+            keyvector |= 1 << bitshift;
+        }
+        
+        function clear_bit(bitshift) {
+            keyvector &= ~(1 << bitshift);
+        }
+        
+        function updateKeyVector() {
+            var state = '{"state":';
+            
+            for (var key in key_dict) {
+                if (keymap[key] == true) {
+                    set_bit(key_dict[key]);
+                }
+                else {
+                    clear_bit(key_dict[key]);
+                }
+            }
+            state += keyvector + '}';
+            console.log(bin(keyvector));
+            socket.emit('updateKeyVector', state);
+        }
+        
         function handleKeyPressed(event) {
-            
-            //FORWARD
-            if (event.keyCode == 38) { //up arrow key 
-                changeMotorDirection(1);
-            }
-            
-            //REVERSE 
-            else if (event.keyCode == 40) { //down arrow key 
-                changeMotorDirection(2);
-            }
-            
-            //STRAFE LEFT
-            if (event.keyCode == 37) { //left arrow key 
-                changeMotorDirection(3);
-            }
-            
-            //STRAFE RIGHT
-            else if (event.keyCode == 39) { //right arrow key 
-                changeMotorDirection(4); 
-            }
-            
-            //ASCEND 
-            if (event.keyCode == 32) { //spacebar key 
-                changeMotorDirection(5);
-            }
-            
-            /* Need to discuss what key we should use for this.  Shift doesn't record continuous presses when you hold it.
-             * Only will register 1 press which is not what we want when the ROV is diving/submerging  
-             */
-            //SUBMERGE
-            else if (event.keyCode == 16) { //shift key  
-                changeMotorDirection(6);
-            }
-            
-            //PITCH UP
-            if (event.keyCode == 87) { //"w" key  
-                changeMotorDirection(7); 
-            }
-            
-            //PITCH DOWN
-            else if (event.keyCode == 83) { //"s" key 
-                changeMotorDirection(8);
-            }
-            
-            //YAW LEFT
-            if (event.keyCode == 65) { //"a" key 
-                changeMotorDirection(9);
-            }
-            
-            //YAW RIGHT
-            else if (event.keyCode == 68) { //"d" key 
-                changeMotorDirection(10);
-            }
+            keymap[event.keyCode] = true;
+            updateKeyVector();
         }
         
         function handleKeyReleased(event) {
-            changeMotorDirection(0); //no motor keys being pressed 
+            keymap[event.keyCode] = false;
+            updateKeyVector();
         }
         
         function changeLEDs(state) {

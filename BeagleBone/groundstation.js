@@ -49,7 +49,7 @@ var server = http.createServer(function (req, res) {
    var contentType = 'text/html';
     
    /* Allows Custom CSS */
-   if(fileExtension == '.css'){
+   if (fileExtension == '.css') {
       contentType = 'text/css';
    }
     
@@ -77,7 +77,7 @@ var io = require('socket.io').listen(server);
 
 /* On Established Connection */
 io.on('connection', function (socket) {
-   socket.on('changeMotorDirection', handleMotorChange);
+   socket.on('updateKeyVector', handleMotorChange);
    socket.on('handleRadioButtons', handleMotorSpeed);
    socket.on('changeLEDs', handleLEDs);
 });
@@ -110,58 +110,14 @@ function onSerial(x) {
 
 /* Handles Motor Commands */
 function handleMotorChange(data) {
-    var newData = JSON.parse(data);
-    
-   if (newData.state == '0') {
-      clear_motor();
-      console.log("Motor: IDLE");
-   }
-    
-   if (newData.state == '1') {
-      set_motor('forward');
-      console.log("Motor: FORWARD");
-   }
-   else if (newData.state == '2') {
-      set_motor('backward');
-      console.log("Motor: BACKWARD");
-   }
-    
-   if (newData.state == '3') {
-      set_motor('left');  
-      console.log("Motor: LEFT");
-   }
-   else if (newData.state == '4') {
-      set_motor('right');
-      console.log("Motor: RIGHT");
-   }
- 
-   if (newData.state == '5') { //ascend        
-      set_motor('up');
-      console.log("Motor: ASCEND/UP");
-   }
-   else if (newData.state == '6') { //submerge 
-      set_motor('down');
-      console.log("Motor: SUBMERGE/DOWN");
-   } 
-    
-   if (newData.state == '7') {       
-      set_motor('pitch up');
-      console.log("Motor: PITCH UP");
-   }
-   else if (newData.state == '8') { 
-      set_motor('pitch down');
-      console.log("Motor: PITCH DOWN");
-   }
-    
-   if (newData.state == '9') {       
-      set_motor('yaw left');
-      console.log("Motor: YAW LEFT");
-   }
-   else if (newData.state == '10') { 
-      set_motor('yaw right');
-      console.log("Motor: YAW RIGHT");
-   }
-    
+   var newData = JSON.parse(data);
+   //console.log(bin(newData.state));
+   clear_motor();
+
+   command |= newData.state;
+   //console.log('1: ' + command);
+   //console.log(bin(command));
+
    /* Send Newly Updated Command */
    if (old_command != command) {
       send_command();
@@ -228,74 +184,6 @@ function set_speed(speed) {
 function clear_speed() {
    for (var i = 0; i < speed_size; i++) {
       command &= ~(1 << (i + speed_shift));
-   }
-}
-
-/* Sets Motor Direction Bits */
-function set_motor() {
-   if (arguments.length > motor_size) {
-      throw new Error('Too many motor commands');
-   }
-   
-   /* Clear Old Motor Commands */
-   clear_motor();
-   
-   for (var i = 0; i < arguments.length; i++) {
-      switch (arguments[i]) {
-         case "down":
-            set_bit(down);
-            break;
-         case "up":
-            set_bit(up);
-            break;
-         case "backward":
-            set_bit(backward);
-            break;
-         case "forward":
-            set_bit(forward);
-            break;
-         case "right":
-            set_bit(right);
-            break;
-         case "left":
-            set_bit(left);
-            break;
-         case "pitch up":
-            set_bit(pitch_up);
-            break;
-         case "pitch down":
-            set_bit(pitch_down);
-            break;
-         case "yaw right":
-            set_bit(yaw_right);
-            break;
-         case "yaw left":
-            set_bit(yaw_left);
-            break;
-         default:
-            throw new Error('Invalid motor command: ' + arguments[i]);
-      }
-   }
-
-   /* Sanity Checks */
-   if (check_bit(up) && check_bit(down)) {
-      throw new Error('Cannot set both up and down');
-   }
-   
-   if (check_bit(backward) && check_bit(forward)) {
-      throw new Error('Cannot set both backward and forward');
-   }
-   
-   if (check_bit(right) && check_bit(left)) {
-      throw new Error('Cannot set both left and right');
-   }
-   
-   if (check_bit(pitch_up) && check_bit(pitch_down)) {
-      throw new Error('Cannot set both pitch up and down');
-   }
-   
-   if (check_bit(yaw_right) && check_bit(yaw_left)) {
-      throw new Error('Cannot set both yaw left and right');
    }
 }
 
