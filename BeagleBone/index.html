@@ -165,6 +165,10 @@
            socket.emit('handleRadioButtons', '{"state":' + speed + '}');
            document.getElementById("speed").innerHTML = "Motor Speed: " + speed;
         }
+        
+        function testFunc(speed) {
+           console.log("success! " + speed);
+        }
 
         
         function initROV() {
@@ -200,14 +204,14 @@
                     <p id="speed">Motor Speed: 0</p>
                     
                     <form>
-                        <input type="range" background="white;" name="speed" min="1" max="7" step="1" onclick="handleRadioButtons(1)"><br>
-                        <input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
+                        <input type="range" id="speedSlider" background="white;" name="speed" min="1" max="7" step="1" onchange="handleRadioButtons(document.getElementById('speedSlider').value)"><br>
+                        <!--<input type="radio" name="speed" value="1" checked onclick = "handleRadioButtons(1)"> 1<br>
                         <input type="radio" name="speed" value="2" onclick = "handleRadioButtons(2)"> 2<br>
                         <input type="radio" name="speed" value="3" onclick = "handleRadioButtons(3)"> 3<br>  
                         <input type="radio" name="speed" value="4" onclick = "handleRadioButtons(4)"> 4<br>  
                         <input type="radio" name="speed" value="5" onclick = "handleRadioButtons(5)"> 5<br>  
                         <input type="radio" name="speed" value="6" onclick = "handleRadioButtons(6)"> 6<br>  
-                        <input type="radio" name="speed" value="7" onclick = "handleRadioButtons(7)"> 7<br>  
+                        <input type="radio" name="speed" value="7" onclick = "handleRadioButtons(7)"> 7<br>-->
                     </form> 
                 </td>
             </tr>
