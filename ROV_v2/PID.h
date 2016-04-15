@@ -23,7 +23,7 @@
 #define ANGLE_SCALE 16.0f
 
 #define PITCH_SET 720
-#define YAW_SET 32
+#define YAW_SET 96
 #define YAW_LIMIT 2880
 #define YAW_MAX 5760
 

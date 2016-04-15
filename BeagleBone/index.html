@@ -131,25 +131,70 @@
 
 <body onload="initROV()">
     <div style="margin: 30px">
-        <h1 align="center" class="shadow">ROV CONTROL STATION</h1>
+        <h1 style="padding: 10px" align="center" class="shadow">ROV CONTROL STATION</h1>
         <table>
             <tr>
                 <td style="padding: 10px" width="70%">
                     <img src="img/SeaFloor.jpg" style="width: 100%;">
                     <!--<img src="http://192.168.254.2:8082/?action=stream" style="width:100%" />-->
                 </td>
-
                 <td style="padding: 10px" width="30%" align="left" valign="top">
-                    <p id="outputStatus">Vehicle Status: IDLE</p>
+                    <table>
+                        <tr>
+                            <td>
+                                <p id="outputStatus">Motion</p>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p id="outputStatus">Lights</p>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p id="outputStatus">Depth</p>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p id="outputStatus">Battery</p>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="padding: 10px" width="30%" align="left" valign="top">
+                    <p id="outputStatus">Motion: IDLE</p>
                     <br>
                     <p id="lights" style="margin: 0 0 0px;">Lights Status: OFF</p>
                     <button type="button" onclick="changeLEDs(1);">ON</button>
                     <button type="button" onclick="changeLEDs(0);">OFF</button>
-                    <p id="speed">Motor Speed: 1</p>
+                    <br>
+                    <p>Depth: 10 Meters</p>
+                    <br>
+                    <p>Battery: 100%</p>
                     
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p id="speed">Motor Speed: 1</p>
                     <form>
                         <input type="range" background="white;" id="speedSlider" min="1" max="7" step="1" value="1" onchange="sliderChange()"><br>
                     </form> 
+                </td>
+                
+                <td>
+                </td>
+                <td>
                 </td>
             </tr>
         </table>

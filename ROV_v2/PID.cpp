@@ -149,12 +149,14 @@ void pid_calculate(User_Commands user_commands) {
 
   yaw_pid = KP_YAW * errors.yaw_err;
   
-//  Serial.print(roll_pid);
-//  Serial.print("   ");
-//  Serial.print(pitch_pid);
-//  Serial.print("   ");
-//  Serial.print(yaw_pid);
-//  Serial.println();
+#ifdef DEBUG_PID
+  Serial.print(roll_pid);
+  Serial.print("   ");
+  Serial.print(pitch_pid);
+  Serial.print("   ");
+  Serial.print(yaw_pid);
+  Serial.println();
+#endif
 
   pid_output.roll_corr = pid_to_thrust(roll_pid);
   pid_output.pitch_corr = pid_to_thrust(pitch_pid);

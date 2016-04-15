@@ -4,6 +4,9 @@
 #include "PID.h"
 #include "IMU_ROV.h"
 
+/* Uncomment to Print PID Values */
+//#define DEBUG_PID
+
 Command command;
 User_Commands user_commands;
 
@@ -26,17 +29,17 @@ void loop() {
   
   //Serial.println(user_commands.user_speed);
   
-//  Serial.print("Forward: ");
-//  Serial.print(user_commands.forward);
+//  Serial.print("Ascend: ");
+//  Serial.print(user_commands.up);
 //  Serial.print("   ");
-//  Serial.print("Reverse: ");
-//  Serial.print(user_commands.backward);
+//  Serial.print("Submerge: ");
+//  Serial.print(user_commands.down);
 //  Serial.print("   ");
-//  Serial.print("Left: ");
-//  Serial.print(user_commands.left);
+//  Serial.print("Yaw_L: ");
+//  Serial.print(user_commands.yaw_left);
 //  Serial.print("   ");
-//  Serial.print("Right: ");
-//  Serial.print(user_commands.right);
+//  Serial.print("Yaw_R: ");
+//  Serial.print(user_commands.yaw_right);
 //  Serial.println();
 
   /* PID Correction */
