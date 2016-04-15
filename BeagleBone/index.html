@@ -111,6 +111,10 @@
            socket.emit('handleSlider', '{"state":' + speed + '}');
            document.getElementById("speed").innerHTML = "Motor Speed: " + speed;
         }
+        
+        function testFunc(speed) {
+           console.log("success! " + speed);
+        }
 
         function sliderChange() {
             handleSlider(document.getElementById('speedSlider').value);
