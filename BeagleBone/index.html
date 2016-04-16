@@ -28,7 +28,7 @@
         const key_a = 65;
         const key_d = 68;
         
-        // Establishing connection with server
+        /* Establishing Connection with Server */
         var socket = io.connect();
         var keymap = [];
         var key_dict = [];
@@ -94,26 +94,18 @@
         
         function changeLEDs(state) {
             if (state == 0) {
-                // Emit message changing the state to 0
                 socket.emit('changeLEDs', '{"state":0}');
-                // Change led status to on 
-                document.getElementById("lights").innerHTML = "Lights Status: OFF";
+                document.getElementById("lights").innerHTML = "OFF";
             }
             else if (state == 1) {
-                // Emit message changing the state to 4
                 socket.emit('changeLEDs', '{"state":1}');
-                // Change led status to off
-                document.getElementById("lights").innerHTML = "Lights Status: ON";
+                document.getElementById("lights").innerHTML = "ON";
             }
         }
         
         function handleSlider(speed) {
            socket.emit('handleSlider', '{"state":' + speed + '}');
-           document.getElementById("speed").innerHTML = "Motor Speed: " + speed;
-        }
-        
-        function testFunc(speed) {
-           console.log("success! " + speed);
+           document.getElementById("speed").innerHTML = speed;
         }
 
         function sliderChange() {
@@ -122,8 +114,11 @@
         }
         
         function initROV() {
-           //default LED setting set to "off" position
+           /* Default Lights to Off */
            changeLEDs(0);
+           
+           /* Default Speed to 1 */
+           handleSlider(1);
         }
     </script>
     
@@ -131,74 +126,106 @@
 
 <body onload="initROV()">
     <div style="margin: 30px">
-        <h1 style="padding: 10px" align="center" class="shadow">ROV CONTROL STATION</h1>
-        <table>
+        <h1 style="margin: 10px" align="center" class="shadow">ROV CONTROL STATION</h1>
+        <table style="border: 0px solid black">
             <tr>
-                <td style="padding: 10px" width="70%">
+                <td valign="top" style="padding: 10px" width="60%">
                     <img src="img/SeaFloor.jpg" style="width: 100%;">
                     <!--<img src="http://192.168.254.2:8082/?action=stream" style="width:100%" />-->
                 </td>
                 <td style="padding: 10px" width="30%" align="left" valign="top">
-                    <table>
+                    <table style="border: 1px solid white; border-collapse: collapse" width="100%">
                         <tr>
-                            <td>
-                                <p id="outputStatus">Motion</p>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Speed</p>
                             </td>
-                            <td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="speed">
+                                    1
+                                </p>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <p id="outputStatus">Lights</p>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Roll</p>
                             </td>
-                            <td>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p id="outputStatus">Depth</p>
-                            </td>
-                            <td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    0 Deg
+                                </p>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <p id="outputStatus">Battery</p>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Pitch</p>
                             </td>
-                            <td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    0 Deg
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Yaw</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    0 Deg
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Depth</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    0 Meters
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Lights</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="lights">
+                                    OFF
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Battery</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    100%
+                                </p>
                             </td>
                         </tr>
                     </table>
-                </td>
-                <td style="padding: 10px" width="30%" align="left" valign="top">
-                    <p id="outputStatus">Motion: IDLE</p>
-                    <br>
-                    <p id="lights" style="margin: 0 0 0px;">Lights Status: OFF</p>
-                    <button type="button" onclick="changeLEDs(1);">ON</button>
-                    <button type="button" onclick="changeLEDs(0);">OFF</button>
-                    <br>
-                    <p>Depth: 10 Meters</p>
-                    <br>
-                    <p>Battery: 100%</p>
-                    
-                    
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p id="speed">Motor Speed: 1</p>
+                    <p style="margin: 0px; padding-top: 20px;">Speed Setting</p>
                     <form>
                         <input type="range" background="white;" id="speedSlider" min="1" max="7" step="1" value="1" onchange="sliderChange()"><br>
-                    </form> 
-                </td>
-                
-                <td>
-                </td>
-                <td>
+                    </form>
+                    <table width="100%">
+                        <tr>
+                            <td align="left">
+                                <p style="margin: 0px">1</p>
+                            </td>
+                            <td align="right">
+                                <p style="margin: 0px">7</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <p style="margin: 0px; padding-top: 20px;">Lights </p>
+                    <button type="button" onclick="changeLEDs(1);">ON</button>
+                    <button type="button" onclick="changeLEDs(0);">OFF</button>
                 </td>
             </tr>
         </table>
     </div>
-  
 </body>
 </html>

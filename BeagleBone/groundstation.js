@@ -44,7 +44,8 @@ var options = {
 /* Initialize Server on Port 8888 */
 var server = http.createServer(function (req, res) {
    /* Request HTML Files */
-   var file = '/var/lib/cloud9/autorun' + ((req.url == '/') ? '/index.html' : req.url);
+   //var file = '/var/lib/cloud9/autorun' + ((req.url == '/') ? '/index.html' : req.url);
+   var file = '/var/lib/cloud9/H2ROV/BeagleBone' + ((req.url == '/') ? '/index.html' : req.url);
    var fileExtension = path.extname(file);
    var contentType = 'text/html';
     

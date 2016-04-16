@@ -17,7 +17,9 @@ h1 {
 }
 
 p {
-   font-size: 24px;
+   font-size: 18px;
+   margin: 3px;
+   padding: 0px;
 }
 
 button {
