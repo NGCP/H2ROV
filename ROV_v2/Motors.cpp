@@ -209,6 +209,7 @@ void set_motor_speed() {
   escR1.writeMicroseconds(motor_values.m5_pwm);
   escR2.writeMicroseconds(motor_values.m6_pwm);
   
+#ifdef DEBUG_PID
   Serial.print(motor_values.m1_pwm);
   Serial.print("   ");
   Serial.print(motor_values.m2_pwm);
@@ -221,4 +222,5 @@ void set_motor_speed() {
   Serial.print("   ");
   Serial.print(motor_values.m6_pwm);
   Serial.println();
+#endif
 }
