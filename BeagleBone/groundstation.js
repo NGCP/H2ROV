@@ -16,6 +16,7 @@ const motor_shift = 1;
 const speed_size = 3;
 const speed_shift = 11;
 const light_shift = 14;
+const power_shift = 15;
 const command_size = 32;
 
 /* Motor Command Constants */
@@ -87,6 +88,7 @@ io.on('connection', function (socket) {
    socket.on('updateKeyVector', handleMotorChange);
    socket.on('handleSlider', handleMotorSpeed);
    socket.on('changeLEDs', handleLEDs);
+   socket.on('updateSystem', handleSystemState);
 });
 
 /* Indicate Server Running */
@@ -133,6 +135,24 @@ function sendIMUData(data) {
 
 /* ---------------- Command Handling Functions ---------------- */
 
+/* Handles System State On/Off */
+function handleSystemState(data) {
+   var newData = JSON.parse(data);
+   var state = newData.state;
+   
+   if (state == '1') {
+      set_power('on');
+      console.log("Power: ON");
+   }
+   else {
+      set_power('off');
+      console.log("Power: OFF");
+   }
+      
+   /* Send Newly Updated Command */
+   send_command();
+}
+
 /* Handles Motor Commands */
 function handleMotorChange(data) {
    var newData = JSON.parse(data);
@@ -164,7 +184,7 @@ function handleLEDs(data) {
    }
    
    /* Send Newly Updated Command */
-   send_command()
+   send_command();
 }
 
 /* Handles Motor Speed Setting */
@@ -179,6 +199,20 @@ function handleMotorSpeed(data) {
 }
 
 /* --------------------- Helper Functions --------------------- */
+
+/* Set System Power Bit */
+function set_power(setting) {
+   switch (setting) {
+      case 'on':
+         set_bit(power_shift);
+         break;
+      case 'off':
+         clear_bit(power_shift);
+         break;
+      default:
+         throw new Error("Invalid light setting: use 'on' or 'off'");
+   }
+}
 
 /* Sets Light Bit */
 function set_light(setting) {
