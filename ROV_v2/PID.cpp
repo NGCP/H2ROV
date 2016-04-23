@@ -28,12 +28,29 @@ void init_pid() {
   setpoints.yaw_sp = imu_data[YAW_DATA];
 }
 
+/* Sends IMU Data to BBB */
+void send_IMU_data(int16_t *imu_data) {
+  uint8_t roll, pitch, yaw;
+  uint8_t rpy[4] = {0, 0, 0, 0};
+  
+  roll = ((imu_data[ROLL_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
+  pitch = ((imu_data[PITCH_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
+  yaw = ((imu_data[YAW_DATA] / ANGLE_SCALE)) * ((float)MAX_BYTE / (float)MAX_ANGLE);
+  
+  Serial1.write(roll);
+  Serial1.write(pitch);
+  Serial1.write(yaw);
+}
+
 /* Calculates Roll, Pitch, and Yaw Setpoints */
 void calculate_setpoints(User_Commands user_commands) {
   int16_t imu_data[3] = {0, 0, 0};
   
   /* Read IMU Data */
   readEulData(imu_data);
+  
+  /* Send Angle Data Over Serial */
+  send_IMU_data(imu_data);
   
   /* Save Previous IMU Data */
   for (int i = 0; i < 3; i++) {

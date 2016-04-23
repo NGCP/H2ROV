@@ -26,7 +26,7 @@ void loop() {
   user_commands = command.get_user_commands();
   
   //user_commands = 0;
-  
+  //Serial1.print(1234567890);
   //Serial.println(user_commands.user_speed);
   
 //  Serial.print("Ascend: ");

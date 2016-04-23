@@ -21,6 +21,9 @@
 #define PID_MAX 5760
 #define INTEGRAL_MAX 160
 #define ANGLE_SCALE 16.0f
+#define ANGLE_OFFSET 180
+#define MAX_ANGLE 360
+#define MAX_BYTE 255
 
 #define PITCH_SET 720
 #define YAW_SET 96
