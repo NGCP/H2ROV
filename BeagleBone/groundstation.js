@@ -120,7 +120,7 @@ function sendIMUData(data) {
    var roll = 0, pitch = 0, yaw = 0, battery = 0;
    var system_data;
    
-   if (data[3]) {
+   if (data[3] != null) {
       roll = Math.floor(data[0] * (max_angle / max_byte) - angle_offset);
       pitch = Math.floor(data[1] * (max_angle / max_byte) - angle_offset);
       yaw = Math.floor(data[2] * (max_angle / max_byte));
