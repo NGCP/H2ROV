@@ -124,11 +124,11 @@ function sendIMUData(data) {
       roll = Math.floor(data[0] * (max_angle / max_byte) - angle_offset);
       pitch = Math.floor(data[1] * (max_angle / max_byte) - angle_offset);
       yaw = Math.floor(data[2] * (max_angle / max_byte));
-      battery = Math.floor(data[3]);
+      battery = data[3];
       
       system_data = '{"roll": ' + roll +
                  ', "pitch": ' + pitch +
-                 ', "yaw": ' + yaw + 
+                 ', "yaw": ' + yaw +
                  ', "battery": ' + battery + '}';
       
       io.sockets.emit('imu', system_data);
