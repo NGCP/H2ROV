@@ -6,6 +6,7 @@ Command::Command() {
 
   command = 0;
   memset(&user_commands, 0, sizeof(User_Commands));
+  user_commands.power = false;
 }
 
 /* Checks for High Bit */
@@ -41,6 +42,10 @@ void Command::parse_light() {
   else {
     // turn_off_light()
   }
+}
+
+void Command::parse_power() {
+  user_commands.power = check_bit(POWER_SHIFT);
 }
 
 /* Checks Speed Bits */
@@ -82,6 +87,7 @@ bool Command::parse_command() {
   }
 
   parse_light();
+  parse_power();
   parse_speed();
   parse_motor();
 

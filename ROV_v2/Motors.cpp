@@ -201,7 +201,12 @@ void motor_calculation(User_Commands user_commands) {
 }
 
 /* Send PWM Values to ESCs */
-void set_motor_speed() {
+void set_motor_speed(bool power) {
+  
+  if (!power) {
+    disable_motors();
+  }
+
   escP1.writeMicroseconds(motor_values.m1_pwm);
   escP2.writeMicroseconds(motor_values.m2_pwm);
   escY1.writeMicroseconds(motor_values.m3_pwm);
@@ -209,7 +214,7 @@ void set_motor_speed() {
   escR1.writeMicroseconds(motor_values.m5_pwm);
   escR2.writeMicroseconds(motor_values.m6_pwm);
   
-#ifdef DEBUG_PID
+#ifdef DEBUG_PWM
   Serial.print(motor_values.m1_pwm);
   Serial.print("   ");
   Serial.print(motor_values.m2_pwm);
@@ -223,4 +228,14 @@ void set_motor_speed() {
   Serial.print(motor_values.m6_pwm);
   Serial.println();
 #endif
+}
+
+/* Send Zero Command to All Thrusters */
+void disable_motors() {
+  motor_values.m1_pwm = ZERO_THRUST;
+  motor_values.m2_pwm = ZERO_THRUST;
+  motor_values.m3_pwm = ZERO_THRUST;
+  motor_values.m4_pwm = ZERO_THRUST;
+  motor_values.m5_pwm = ZERO_THRUST;
+  motor_values.m6_pwm = ZERO_THRUST;
 }

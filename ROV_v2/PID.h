@@ -5,6 +5,9 @@
 #include "Command.h"
 #include "IMU_ROV.h"
 
+/* Uncomment to Print PID Values */
+//#define DEBUG_PID
+
 /* PID Parameters */
 #define KP_ROLL 5
 #define KI_ROLL 1
@@ -34,6 +37,13 @@
 #define ROLL_DATA 1
 #define PITCH_DATA 2
 
+#define BATTERY_PIN 0
+#define MIN_VOLTAGE 3.0f
+#define MAX_VOLTAGE 5.0f
+#define MAX_ANALOG 1023
+#define MAX_PERCENT 100.0f
+#define BATTERY_SAMPLES 50
+
 /* Angular Setpoints */
 typedef struct Setpoints {
   int16_t roll_sp;
@@ -62,6 +72,9 @@ extern volatile Errors errors;
 extern volatile int16_t eul_angles[3];
 extern volatile int16_t prev_angles[3];
 extern volatile int16_t error_sum[3];
+extern volatile int battery_percent;
+extern volatile int battery_sum;
+extern volatile int battery_count;
 
 /* Initialize PID Controller */
 void init_pid();

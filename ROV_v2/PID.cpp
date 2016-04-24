@@ -7,6 +7,9 @@ volatile Errors errors = {0, 0, 0};
 volatile int16_t eul_angles[3] = {0, 0, 0};
 volatile int16_t prev_angles[3] = {0, 0, 0};
 volatile int16_t error_sum[3] = {0, 0, 0};
+extern volatile int battery_percent = 0;
+volatile int battery_sum = 0;
+volatile int battery_count = 0;
 
 /* Initialize PID Controller */
 void init_pid() {
@@ -28,18 +31,55 @@ void init_pid() {
   setpoints.yaw_sp = imu_data[YAW_DATA];
 }
 
+/* Get Battery Level */
+uint8_t get_battery_level() {
+  int percent, analog_input;
+  float input_voltage;
+ 
+  /* Read Voltage Divider Input */
+  analog_input = analogRead(BATTERY_PIN);
+  
+  /* Convert Analog Values to Voltage */
+  input_voltage = analog_input * (MAX_VOLTAGE / MAX_ANALOG);
+  
+  if (input_voltage < MIN_VOLTAGE) {
+    input_voltage = MIN_VOLTAGE;
+  }
+  
+  /* Calculate Battery Percentage */
+  percent = (input_voltage - MIN_VOLTAGE) * (MAX_PERCENT / (MAX_VOLTAGE - MIN_VOLTAGE));
+  
+  /* Keep Track of Samples for Running Average */
+  battery_sum += percent;
+  battery_count++;
+
+  /* Calculate Battery Percentage Over Sample Period */
+  if (battery_count == BATTERY_SAMPLES) {
+    percent = battery_sum / battery_count;
+    battery_percent = percent;
+    battery_sum = 0;
+    battery_count = 0;
+  }
+  
+  return (uint8_t)battery_percent;
+}
+
 /* Sends IMU Data to BBB */
 void send_IMU_data(int16_t *imu_data) {
-  uint8_t roll, pitch, yaw;
+  uint8_t roll, pitch, yaw, battery;
   uint8_t rpy[4] = {0, 0, 0, 0};
   
   roll = ((imu_data[ROLL_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   pitch = ((imu_data[PITCH_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   yaw = ((imu_data[YAW_DATA] / ANGLE_SCALE)) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   
+  battery = get_battery_level();
+  
   Serial1.write(roll);
   Serial1.write(pitch);
   Serial1.write(yaw);
+  Serial1.write(battery);
+  //Serial.println(battery);
 }
 
 /* Calculates Roll, Pitch, and Yaw Setpoints */

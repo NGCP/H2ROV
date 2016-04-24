@@ -6,6 +6,9 @@
 #include "PID.h"
 #include "Command.h"
 
+/* Uncomment to Print PWM Values */
+//#define DEBUG_PWM
+
 #define M1_PIN 8
 #define M2_PIN 9
 #define M3_PIN 10
@@ -89,6 +92,9 @@ float buoy_compensation();
 void motor_calculation(User_Commands user_commands);
 
 /* Send PWM Values to ESCs */
-void set_motor_speed();
+void set_motor_speed(bool power);
+
+/* Send Zero Command to All Thrusters */
+void disable_motors();
 
 #endif

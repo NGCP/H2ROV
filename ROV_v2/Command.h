@@ -8,6 +8,7 @@
 #define MOTOR_SHIFT 1
 #define SPEED_SHIFT 11
 #define LIGHT_SHIFT 14
+#define POWER_SHIFT 15
 #define COMMAND_SIZE 32
 
 /* Motor Command Constants */
@@ -36,6 +37,7 @@ typedef struct User_Commands {
   bool pitch_down;
   bool yaw_right;
   bool yaw_left;
+  bool power;
   int user_speed;
 } User_Commands;
 
@@ -52,6 +54,7 @@ class Command {
     bool check_parity();
     bool check_bit(int bitshift);
     void parse_light();
+    void parse_power();
     void parse_speed();
     void parse_motor();
 };
