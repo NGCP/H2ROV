@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ROV GCS</title>
+    <script src = "/socket.io/socket.io.js" ></script>
+    <link rel="stylesheet" type="text/css" href="css/controlstation.css">
+    
+    <script>
+        const down = 1;
+        const up = 2;
+        const backward = 3;
+        const forward = 4;
+        const right = 5;
+        const left = 6;
+        const pitch_up = 7;
+        const pitch_down = 8;
+        const yaw_right = 9;
+        const yaw_left = 10;
+        
+        const key_up_arrow = 38;
+        const key_down_arrow = 40;
+        const key_left_arrow = 37;
+        const key_right_arrow = 39;
+        const key_spacebar = 32;
+        const key_shift = 16;
+        const key_w = 87;
+        const key_s = 83;
+        const key_a = 65;
+        const key_d = 68;
+        
+        /* Establishing Connection with Server */
+        var socket = io.connect();
+        var keymap = [];
+        var key_dict = [];
+        var keyvector = 0;
+
+        /* Show IMU Data on Control Station */
+        socket.on('imu', function (data) {
+            var system_data = JSON.parse(data);
+            document.getElementById('roll').innerHTML = system_data.roll + ' Deg';
+            document.getElementById('pitch').innerHTML = system_data.pitch + ' Deg';
+            document.getElementById('yaw').innerHTML = system_data.yaw + ' Deg';
+            document.getElementById('battery').innerHTML = system_data.battery + '%';
+        });
+
+        function create_key_dict() {
+            key_dict[key_up_arrow] = forward;
+            key_dict[key_down_arrow] = backward;
+            key_dict[key_left_arrow] = left;
+            key_dict[key_right_arrow] = right;
+            key_dict[key_spacebar] = down;
+            key_dict[key_shift] = up;
+            key_dict[key_w] = pitch_up;
+            key_dict[key_s] = pitch_down;
+            key_dict[key_a] = yaw_left;
+            key_dict[key_d] = yaw_right;
+        }
+        
+        create_key_dict();
+        
+        window.addEventListener("keydown", handleKeyPressed, false);
+        window.addEventListener("keyup", handleKeyReleased, false);
+        
+        /* Converts Decimal to Binary */
+        function bin(dec) {
+           return (dec >>> 0).toString(2);
+        }
+        
+        /* Sets Given Bit in Command Vector */
+        function set_bit(bitshift) {
+            keyvector |= 1 << bitshift;
+        }
+        
+        function clear_bit(bitshift) {
+            keyvector &= ~(1 << bitshift);
+        }
+        
+        function updateKeyVector() {
+            var state = '{"state":';
+            
+            for (var key in key_dict) {
+                if (keymap[key] == true) {
+                    set_bit(key_dict[key]);
+                }
+                else {
+                    clear_bit(key_dict[key]);
+                }
+            }
+            state += keyvector + '}';
+            socket.emit('updateKeyVector', state);
+        }
+        
+        function handleKeyPressed(event) {
+            keymap[event.keyCode] = true;
+            updateKeyVector();
+        }
+        
+        function handleKeyReleased(event) {
+            keymap[event.keyCode] = false;
+            updateKeyVector();
+        }
+        
+        function changeLEDs(state) {
+            if (state == 0) {
+                socket.emit('changeLEDs', '{"state":0}');
+                document.getElementById("lights").innerHTML = "OFF";
+            }
+            else if (state == 1) {
+                socket.emit('changeLEDs', '{"state":1}');
+                document.getElementById("lights").innerHTML = "ON";
+            }
+        }
+
+        function systemState(state) {
+            if (state == 0) {
+                socket.emit('updateSystem', '{"state":0}');
+                document.getElementById("system").innerHTML = "OFF";
+            }
+            else if (state == 1) {
+                socket.emit('updateSystem', '{"state":1}');
+                document.getElementById("system").innerHTML = "ON";
+            }
+        }
+
+        function handleSlider(speed) {
+           socket.emit('handleSlider', '{"state":' + speed + '}');
+           document.getElementById("speed").innerHTML = speed;
+        }
+
+        function sliderChange() {
+            handleSlider(document.getElementById('speedSlider').value);
+            document.getElementById('speedSlider').blur();
+        }
+        
+        function initROV() {
+           /* Default Lights to Off */
+           changeLEDs(0);
+
+           /* Default System Off */
+           systemState(0);
+
+           /* Default Speed to 1 */
+           handleSlider(1);
+        }
+    </script>
+    
+</head>
+
+<body onload="initROV()">
+    <div style="margin: 30px">
+        <h1 style="margin: 10px" align="center" class="shadow">ROV CONTROL STATION</h1>
+        <table style="border: 0px solid black">
+            <tr>
+                <td valign="top" style="padding: 10px" width="60%">
+                    <img src="img/SeaFloor.jpg" style="width: 100%;">
+                    <!--<img src="http://192.168.254.2:8082/?action=stream" style="width:100%" />-->
+                </td>
+                <td style="padding: 10px" width="30%" align="left" valign="top">
+                    <table style="border: 1px solid white; border-collapse: collapse" width="100%">
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>System</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="system">
+                                    OFF
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Speed</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="speed">
+                                    1
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Roll</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="roll">
+                                    0 Deg
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Pitch</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="pitch">
+                                    0 Deg
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Yaw</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="yaw">
+                                    0 Deg
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Depth</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="">
+                                    0 Meters
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Lights</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="lights">
+                                    OFF
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Battery</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="battery">
+                                    100%
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <p style="margin: 0px; padding-top: 20px;">Speed Setting</p>
+                    <form>
+                        <input type="range" background="white;" id="speedSlider" min="1" max="7" step="1" value="1" onchange="sliderChange()"><br>
+                    </form>
+                    <table width="100%">
+                        <tr>
+                            <td align="left">
+                                <p style="margin: 0px">1</p>
+                            </td>
+                            <td align="right">
+                                <p style="margin: 0px">7</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <p style="margin: 0px; padding-top: 20px;">Lights </p>
+                    <button type="button" onclick="changeLEDs(1);">ON</button>
+                    <button type="button" onclick="changeLEDs(0);">OFF</button>
+                    <p style="margin: 0px; padding-top: 0px;">System </p>
+                    <button type="button" onclick="systemState(1);">ON</button>
+                    <button type="button" onclick="systemState(0);">OFF</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
