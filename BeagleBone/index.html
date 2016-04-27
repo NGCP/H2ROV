@@ -110,7 +110,7 @@
                 document.getElementById("lights").innerHTML = "ON";
             }
         }
-        
+
         function systemState(state) {
             if (state == 0) {
                 socket.emit('updateSystem', '{"state":0}');
@@ -121,7 +121,7 @@
                 document.getElementById("system").innerHTML = "ON";
             }
         }
-        
+
         function handleSlider(speed) {
            socket.emit('handleSlider', '{"state":' + speed + '}');
            document.getElementById("speed").innerHTML = speed;
@@ -135,10 +135,10 @@
         function initROV() {
            /* Default Lights to Off */
            changeLEDs(0);
-           
+
            /* Default System Off */
            systemState(0);
-           
+
            /* Default Speed to 1 */
            handleSlider(1);
         }
