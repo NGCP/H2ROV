@@ -3,6 +3,7 @@
 #include "Command.h"
 #include "PID.h"
 #include "IMU_ROV.h"
+#include "Depth.h"
 
 Command command;
 User_Commands user_commands;
@@ -30,5 +31,31 @@ void loop() {
   
   /* Actuate Motors */
   set_motor_speed(user_commands.power);
-  //Serial.println(user_commands.power);
+  
+//  Serial.print((int)(imu_data[ROLL_DATA] / 16.0));
+//  Serial.print("   ");
+//  Serial.print((int)(imu_data[PITCH_DATA] / 16.0));
+//  Serial.print("   ");
+//  Serial.print((int)(imu_data[YAW_DATA] / 16.0));
+//  Serial.println();
+  
+//  depth_sensor.read();
+//  
+//  Serial.print("Pressure: "); 
+//  Serial.print(depth_sensor.pressure()); 
+//  Serial.println(" mbar");
+//  
+//  Serial.print("Temperature: "); 
+//  Serial.print(depth_sensor.temperature()); 
+//  Serial.println(" deg C");
+//  
+//  Serial.print("Depth: "); 
+//  Serial.print(depth_sensor.depth()); 
+//  Serial.println(" m");
+//  
+//  Serial.print("Altitude: "); 
+//  Serial.print(depth_sensor.altitude()); 
+//  Serial.println(" m above mean sea level");
+//  
+//  delay(1000);
 }

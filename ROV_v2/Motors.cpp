@@ -9,7 +9,7 @@ Servo escR1;
 Servo escR2;
 
 /* Convert Thrust Values to PWM */
-int thrust_to_pwm(float thrust) {
+int thrust_to_pwm(float thrust, int rev) {
   int pwm = ZERO_THRUST;
 
   if (thrust > MIN_THRUST_ABS) {
@@ -17,6 +17,10 @@ int thrust_to_pwm(float thrust) {
   }
   else if (thrust < -MIN_THRUST_ABS) {
     pwm = REV_SLOPE * thrust + REV_OFFSET;
+  }
+  
+  if (rev) {
+    pwm = (2 * ZERO_THRUST) - pwm;
   }
 
   return pwm;
@@ -192,12 +196,12 @@ void motor_calculation(User_Commands user_commands) {
   m6 = verify_thrust(m6);
 
   /* Calculate PWM Values Based On Thrust */
-  motor_values.m1_pwm = verify_pwm(thrust_to_pwm(m1));
-  motor_values.m2_pwm = verify_pwm(thrust_to_pwm(m2));
-  motor_values.m3_pwm = verify_pwm(thrust_to_pwm(m3));
-  motor_values.m4_pwm = verify_pwm(thrust_to_pwm(m4));
-  motor_values.m5_pwm = verify_pwm(thrust_to_pwm(m5));
-  motor_values.m6_pwm = verify_pwm(thrust_to_pwm(m6));
+  motor_values.m1_pwm = verify_pwm(thrust_to_pwm(m1, FWD));
+  motor_values.m2_pwm = verify_pwm(thrust_to_pwm(m2, REV));
+  motor_values.m3_pwm = verify_pwm(thrust_to_pwm(m3, FWD));
+  motor_values.m4_pwm = verify_pwm(thrust_to_pwm(m4, REV));
+  motor_values.m5_pwm = verify_pwm(thrust_to_pwm(m5, FWD));
+  motor_values.m6_pwm = verify_pwm(thrust_to_pwm(m6, REV));
 }
 
 /* Send PWM Values to ESCs */

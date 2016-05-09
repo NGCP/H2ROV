@@ -4,9 +4,12 @@
 #include "Motors.h"
 #include "Command.h"
 #include "IMU_ROV.h"
+#include "Depth.h"
 
 /* Uncomment to Print PID Values */
 //#define DEBUG_PID
+//#define DEBUG_BATTERY
+#define DEBUG_DEPTH
 
 /* PID Parameters */
 #define KP_ROLL 5
@@ -38,17 +41,20 @@
 #define PITCH_DATA 2
 
 #define BATTERY_PIN 0
-#define MIN_VOLTAGE 3.0f
-#define MAX_VOLTAGE 5.0f
+#define MIN_VOLTAGE 12.8f
+#define MAX_VOLTAGE 16.8f
+#define R1 1763.0f
+#define R2 745.0f
 #define MAX_ANALOG 1023
 #define MAX_PERCENT 100.0f
-#define BATTERY_SAMPLES 50
+#define BATTERY_SAMPLES 100
 
-/* Angular Setpoints */
+/* Setpoints */
 typedef struct Setpoints {
   int16_t roll_sp;
   int16_t pitch_sp;
   int16_t yaw_sp;
+  float depth_sp;
 } Setpoints;
 
 /* Angular Errors (PV - SP) */
@@ -56,6 +62,7 @@ typedef struct Errors {
   int16_t roll_err;
   int16_t pitch_err;
   int16_t yaw_err;
+  float depth_err;
 }Errors;
 
 /* PID Correction Values (THRUST) */
@@ -75,6 +82,9 @@ extern volatile int16_t error_sum[3];
 extern volatile int battery_percent;
 extern volatile int battery_sum;
 extern volatile int battery_count;
+
+/* Initialize Depth Sensor */
+void init_depth();
 
 /* Initialize PID Controller */
 void init_pid();

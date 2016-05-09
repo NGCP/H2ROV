@@ -9,12 +9,17 @@
 /* Uncomment to Print PWM Values */
 //#define DEBUG_PWM
 
+/* Thruster Pins */
 #define M1_PIN 8
 #define M2_PIN 9
 #define M3_PIN 10
 #define M4_PIN 11
 #define M5_PIN 12
 #define M6_PIN 13
+
+/* Forward/Reverse Values */
+#define FWD 0
+#define REV 1
 
 /* Linear Approximations of PWM vs. Thrust (Forward) */
 #define FWD_SLOPE 61.1f
@@ -59,7 +64,7 @@ extern Servo escR1;
 extern Servo escR2;
 
 /* Convert Thrust Values to PWM */
-int thrust_to_pwm(float thrust);
+int thrust_to_pwm(float thrust, int rev);
 
 /* Initialize Motors and PWM Data */
 void init_motors();

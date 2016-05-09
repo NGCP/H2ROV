@@ -7,6 +7,7 @@ Command::Command() {
   command = 0;
   memset(&user_commands, 0, sizeof(User_Commands));
   user_commands.power = false;
+  user_commands.hold_depth = false;
 }
 
 /* Checks for High Bit */
@@ -46,6 +47,10 @@ void Command::parse_light() {
 
 void Command::parse_power() {
   user_commands.power = check_bit(POWER_SHIFT);
+}
+
+void Command::parse_depth() {
+  user_commands.hold_depth = check_bit(DEPTH_SHIFT);
 }
 
 /* Checks Speed Bits */

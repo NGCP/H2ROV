@@ -7,13 +7,26 @@ volatile Errors errors = {0, 0, 0};
 volatile int16_t eul_angles[3] = {0, 0, 0};
 volatile int16_t prev_angles[3] = {0, 0, 0};
 volatile int16_t error_sum[3] = {0, 0, 0};
-extern volatile int battery_percent = 0;
+volatile int battery_percent = 0;
 volatile int battery_sum = 0;
 volatile int battery_count = 0;
+
+MS5837 depth_sensor;
+
+/* Initialize Depth Sensor */
+void init_depth() {
+  depth_sensor.init();
+  depth_sensor.setFluidDensity(1029);
+}
 
 /* Initialize PID Controller */
 void init_pid() {
   int16_t imu_data[3] = {0, 0, 0};
+  
+  /* Initialize Depth Sensor */
+  init_depth();
+  depth_sensor.read();
+  setpoints.depth_sp = depth_sensor.depth();
   
   /* Read Initial IMU Data */
   readEulData(imu_data);
@@ -34,20 +47,23 @@ void init_pid() {
 /* Get Battery Level */
 uint8_t get_battery_level() {
   int percent, analog_input;
-  float input_voltage;
+  float input_voltage, max_vout, min_vout;
+  
+  max_vout = MAX_VOLTAGE * (R2 / (R1 + R2));
+  min_vout = MIN_VOLTAGE * (R2 / (R1 + R2));
  
   /* Read Voltage Divider Input */
   analog_input = analogRead(BATTERY_PIN);
   
   /* Convert Analog Values to Voltage */
-  input_voltage = analog_input * (MAX_VOLTAGE / MAX_ANALOG);
+  input_voltage = analog_input * (max_vout / MAX_ANALOG);
   
-  if (input_voltage < MIN_VOLTAGE) {
-    input_voltage = MIN_VOLTAGE;
+  if (input_voltage < min_vout) {
+    input_voltage = min_vout;
   }
   
   /* Calculate Battery Percentage */
-  percent = (input_voltage - MIN_VOLTAGE) * (MAX_PERCENT / (MAX_VOLTAGE - MIN_VOLTAGE));
+  percent = (input_voltage - min_vout) * (MAX_PERCENT / (max_vout - min_vout));
   
   /* Keep Track of Samples for Running Average */
   battery_sum += percent;
@@ -66,7 +82,7 @@ uint8_t get_battery_level() {
 
 /* Sends IMU Data to BBB */
 void send_IMU_data(int16_t *imu_data) {
-  uint8_t roll, pitch, yaw, battery;
+  uint8_t roll, pitch, yaw, battery, depth;
   uint8_t rpy[4] = {0, 0, 0, 0};
   
   roll = ((imu_data[ROLL_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
@@ -74,17 +90,33 @@ void send_IMU_data(int16_t *imu_data) {
   yaw = ((imu_data[YAW_DATA] / ANGLE_SCALE)) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   
   battery = get_battery_level();
+  depth = (uint8_t)depth_sensor.depth();
   
   Serial1.write(roll);
   Serial1.write(pitch);
   Serial1.write(yaw);
   Serial1.write(battery);
-  //Serial.println(battery);
+  Serial1.write(depth);
+  
+#ifdef DEBUG_BATTERY
+  Serial.println(battery);
+#endif
 }
 
 /* Calculates Roll, Pitch, and Yaw Setpoints */
 void calculate_setpoints(User_Commands user_commands) {
   int16_t imu_data[3] = {0, 0, 0};
+  
+  /* Read Depth Data */
+  depth_sensor.read();
+  
+#ifdef DEBUG_DEPTH
+  Serial.println(depth_sensor.depth());
+#endif
+  
+  if (!user_commands.hold_depth) {
+     setpoints.depth_sp = depth_sensor.depth();
+  }
   
   /* Read IMU Data */
   readEulData(imu_data);
@@ -149,6 +181,9 @@ int16_t threshold_integral_error(int16_t error) {
 
 /* Calculate Angular Errors */
 void calculate_errors() {
+  
+  /* Depth Error Calculation */
+  errors.depth_err = setpoints.depth_sp - depth_sensor.depth();
   
   /* Roll Error Calculation */
   errors.roll_err = setpoints.roll_sp - eul_angles[ROLL_DATA];
