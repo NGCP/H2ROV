@@ -41,6 +41,7 @@
             document.getElementById('pitch').innerHTML = system_data.pitch + ' Deg';
             document.getElementById('yaw').innerHTML = system_data.yaw + ' Deg';
             document.getElementById('battery').innerHTML = system_data.battery + '%';
+            document.getElementById('depth').innerHTML = system_data.depth + ' m';
         });
 
         function create_key_dict() {
@@ -121,6 +122,28 @@
                 document.getElementById("system").innerHTML = "ON";
             }
         }
+        
+        function pidState(state) {
+            if (state == 0) {
+                socket.emit('updatePID', '{"state":0}');
+                document.getElementById("pid").innerHTML = "OFF";
+            }
+            else if (state == 1) {
+                socket.emit('updatePID', '{"state":1}');
+                document.getElementById("pid").innerHTML = "ON";
+            }
+        }
+        
+        function depthHold(state) {
+            if (state == 0) {
+                socket.emit('updateDepth', '{"state":0}');
+                document.getElementById("depth_hold").innerHTML = "OFF";
+            }
+            else if (state == 1) {
+                socket.emit('updateDepth', '{"state":1}');
+                document.getElementById("depth_hold").innerHTML = "ON";
+            }
+        }
 
         function handleSlider(speed) {
            socket.emit('handleSlider', '{"state":' + speed + '}');
@@ -138,6 +161,12 @@
 
            /* Default System Off */
            systemState(0);
+           
+           /* Default PID On */
+           pidState(1);
+           
+           /* Default Depth Hold Off */
+           depthHold(0);
 
            /* Default Speed to 1 */
            handleSlider(1);
@@ -163,6 +192,26 @@
                             </td>
                             <td nowrap style="border: 1px solid white; border-collapse: collapse">
                                 <p id="system">
+                                    OFF
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>PID</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="pid">
+                                    ON
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid white; border-collapse: collapse">
+                                <p>Depth Hold</p>
+                            </td>
+                            <td nowrap style="border: 1px solid white; border-collapse: collapse">
+                                <p id="depth_hold">
                                     OFF
                                 </p>
                             </td>
@@ -252,12 +301,18 @@
                             </td>
                         </tr>
                     </table>
-                    <p style="margin: 0px; padding-top: 20px;">Lights </p>
+                    <p style="margin: 0px; padding-top: 20px;">Lights</p>
                     <button type="button" onclick="changeLEDs(1);">ON</button>
                     <button type="button" onclick="changeLEDs(0);">OFF</button>
-                    <p style="margin: 0px; padding-top: 0px;">System </p>
+                    <p style="margin: 0px; padding-top: 0px;">System</p>
                     <button type="button" onclick="systemState(1);">ON</button>
                     <button type="button" onclick="systemState(0);">OFF</button>
+                    <p style="margin: 0px; padding-top: 0px;">Depth Hold</p>
+                    <button type="button" onclick="depthHold(1);">ON</button>
+                    <button type="button" onclick="depthHold(0);">OFF</button>
+                    <p style="margin: 0px; padding-top: 0px;">PID</p>
+                    <button type="button" onclick="pidState(1);">ON</button>
+                    <button type="button" onclick="pidState(0);">OFF</button>
                 </td>
             </tr>
         </table>

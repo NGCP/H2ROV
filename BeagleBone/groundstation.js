@@ -17,6 +17,8 @@ const speed_size = 3;
 const speed_shift = 11;
 const light_shift = 14;
 const power_shift = 15;
+const depth_shift = 16;
+const pid_shift = 17;
 const command_size = 32;
 
 /* Motor Command Constants */
@@ -89,6 +91,8 @@ io.on('connection', function (socket) {
    socket.on('handleSlider', handleMotorSpeed);
    socket.on('changeLEDs', handleLEDs);
    socket.on('updateSystem', handleSystemState);
+   socket.on('updateDepth', handleDepth);
+   socket.on('updatePID', handlePID);
 });
 
 /* Indicate Server Running */
@@ -117,25 +121,43 @@ function onSerial(x) {
 }
 
 function sendIMUData(data) {
-   var roll = 0, pitch = 0, yaw = 0, battery = 0;
+   var roll = 0, pitch = 0, yaw = 0, battery = 0, depth = 0;
    var system_data;
    
-   if (data[3] != null) {
+   if (data[4] != null) {
       roll = Math.floor(data[0] * (max_angle / max_byte) - angle_offset);
       pitch = Math.floor(data[1] * (max_angle / max_byte) - angle_offset);
       yaw = Math.floor(data[2] * (max_angle / max_byte));
       battery = data[3];
+      depth = data[4];
       
       system_data = '{"roll": ' + roll +
                  ', "pitch": ' + pitch +
                  ', "yaw": ' + yaw +
-                 ', "battery": ' + battery + '}';
+                 ', "battery": ' + battery +
+                 ', "depth": ' + depth + '}';
       
       io.sockets.emit('imu', system_data);
    }
 }
 
 /* ---------------- Command Handling Functions ---------------- */
+
+/* Handles Depth Holding */
+function handleDepth(data) {
+   var newData = JSON.parse(data);
+   var state = newData.state;
+   
+   if (state == '1') {
+      set_depth('on');
+   }
+   else {
+      set_depth('off');
+   }
+      
+   /* Send Newly Updated Command */
+   send_command();
+}
 
 /* Handles System State On/Off */
 function handleSystemState(data) {
@@ -144,11 +166,27 @@ function handleSystemState(data) {
    
    if (state == '1') {
       set_power('on');
-      console.log("Power: ON");
+      //console.log("Power: ON");
    }
    else {
       set_power('off');
-      console.log("Power: OFF");
+      //console.log("Power: OFF");
+   }
+      
+   /* Send Newly Updated Command */
+   send_command();
+}
+
+/* Handles PID System */
+function handlePID(data) {
+   var newData = JSON.parse(data);
+   var state = newData.state;
+   
+   if (state == '1') {
+      set_PID('on');
+   }
+   else {
+      set_PID('off');
    }
       
    /* Send Newly Updated Command */
@@ -202,6 +240,20 @@ function handleMotorSpeed(data) {
 
 /* --------------------- Helper Functions --------------------- */
 
+/* Set Depth Holding Bit */
+function set_depth(setting) {
+   switch (setting) {
+      case 'on':
+         set_bit(depth_shift);
+         break;
+      case 'off':
+         clear_bit(depth_shift);
+         break;
+      default:
+         throw new Error("Invalid depth setting: use 'on' or 'off'");
+   }
+}
+
 /* Set System Power Bit */
 function set_power(setting) {
    switch (setting) {
@@ -212,7 +264,21 @@ function set_power(setting) {
          clear_bit(power_shift);
          break;
       default:
-         throw new Error("Invalid light setting: use 'on' or 'off'");
+         throw new Error("Invalid power setting: use 'on' or 'off'");
+   }
+}
+
+/* Set PID Bit */
+function set_PID(setting) {
+   switch (setting) {
+      case 'on':
+         set_bit(pid_shift);
+         break;
+      case 'off':
+         clear_bit(pid_shift);
+         break;
+      default:
+         throw new Error("Invalid PID setting: use 'on' or 'off'");
    }
 }
 
