@@ -177,8 +177,8 @@ void motor_calculation(User_Commands user_commands) {
   }
 
   /* Calculate Thrust Values */
-  m1 = depth_ref + heave_thrust - pid_output.pitch_corr; // NEED DEPTH CALCULATION
-  m2 = depth_ref + heave_thrust + pid_output.pitch_corr; // NEED DEPTH CALCULATIONs
+  m1 = depth_ref + pid_output.depth_corr + heave_thrust - pid_output.pitch_corr;
+  m2 = depth_ref + pid_output.depth_corr + heave_thrust + pid_output.pitch_corr;
 
   pitch_correction = pitch_stabilization(m1, m2, eul_angles[PITCH_DATA]);
 

@@ -22,6 +22,12 @@ void loop() {
   /* Get User Commands */
   command.parse_command();
   user_commands = command.get_user_commands();
+  
+  Serial.print("Depth: ");
+  Serial.print(user_commands.hold_depth);
+  Serial.print("   PID: ");
+  Serial.print(user_commands.pid);
+  Serial.println();
 
   /* PID Correction */
   pid_calculate(user_commands);
@@ -38,24 +44,4 @@ void loop() {
 //  Serial.print("   ");
 //  Serial.print((int)(imu_data[YAW_DATA] / 16.0));
 //  Serial.println();
-  
-//  depth_sensor.read();
-//  
-//  Serial.print("Pressure: "); 
-//  Serial.print(depth_sensor.pressure()); 
-//  Serial.println(" mbar");
-//  
-//  Serial.print("Temperature: "); 
-//  Serial.print(depth_sensor.temperature()); 
-//  Serial.println(" deg C");
-//  
-//  Serial.print("Depth: "); 
-//  Serial.print(depth_sensor.depth()); 
-//  Serial.println(" m");
-//  
-//  Serial.print("Altitude: "); 
-//  Serial.print(depth_sensor.altitude()); 
-//  Serial.println(" m above mean sea level");
-//  
-//  delay(1000);
 }

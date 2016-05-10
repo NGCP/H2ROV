@@ -1,15 +1,15 @@
 #include "PID.h"
 
-volatile PID_Out pid_output = {0, 0, 0};
-volatile Setpoints setpoints = {0, 0, 0};
-volatile Setpoints ref_sp = {0, 0, 0};
-volatile Errors errors = {0, 0, 0};
+volatile PID_Out pid_output = {0, 0, 0, 0};
+volatile Setpoints setpoints = {0, 0, 0, 0};
+volatile Setpoints ref_sp = {0, 0, 0, 0};
+volatile Errors errors = {0, 0, 0, 0};
 volatile int16_t eul_angles[3] = {0, 0, 0};
 volatile int16_t prev_angles[3] = {0, 0, 0};
 volatile int16_t error_sum[3] = {0, 0, 0};
-volatile int battery_percent = 0;
-volatile int battery_sum = 0;
-volatile int battery_count = 0;
+
+volatile float prev_depth = 0;
+volatile float depth_error_sum = 0;
 
 MS5837 depth_sensor;
 
@@ -44,44 +44,8 @@ void init_pid() {
   setpoints.yaw_sp = imu_data[YAW_DATA];
 }
 
-/* Get Battery Level */
-uint8_t get_battery_level() {
-  int percent, analog_input;
-  float input_voltage, max_vout, min_vout;
-  
-  max_vout = MAX_VOLTAGE * (R2 / (R1 + R2));
-  min_vout = MIN_VOLTAGE * (R2 / (R1 + R2));
- 
-  /* Read Voltage Divider Input */
-  analog_input = analogRead(BATTERY_PIN);
-  
-  /* Convert Analog Values to Voltage */
-  input_voltage = analog_input * (max_vout / MAX_ANALOG);
-  
-  if (input_voltage < min_vout) {
-    input_voltage = min_vout;
-  }
-  
-  /* Calculate Battery Percentage */
-  percent = (input_voltage - min_vout) * (MAX_PERCENT / (max_vout - min_vout));
-  
-  /* Keep Track of Samples for Running Average */
-  battery_sum += percent;
-  battery_count++;
-
-  /* Calculate Battery Percentage Over Sample Period */
-  if (battery_count == BATTERY_SAMPLES) {
-    percent = battery_sum / battery_count;
-    battery_percent = percent;
-    battery_sum = 0;
-    battery_count = 0;
-  }
-  
-  return (uint8_t)battery_percent;
-}
-
 /* Sends IMU Data to BBB */
-void send_IMU_data(int16_t *imu_data) {
+void send_system_data(int16_t *imu_data) {
   uint8_t roll, pitch, yaw, battery, depth;
   uint8_t rpy[4] = {0, 0, 0, 0};
   
@@ -122,7 +86,7 @@ void calculate_setpoints(User_Commands user_commands) {
   readEulData(imu_data);
   
   /* Send Angle Data Over Serial */
-  send_IMU_data(imu_data);
+  send_system_data(imu_data);
   
   /* Save Previous IMU Data */
   for (int i = 0; i < 3; i++) {
@@ -179,11 +143,25 @@ int16_t threshold_integral_error(int16_t error) {
   return output;
 }
 
+/* Thresholds Depth Integral Error */
+float threshold_depth_integral_error(float error) {
+  if (error > DEPTH_INTEGRAL_MAX) {
+    output = DEPTH_INTEGRAL_MAX;
+  }
+  else if (error < -DEPTH_INTEGRAL_MAX) {
+    output = -DEPTH_INTEGRAL_MAX;
+  }
+
+  return output;
+}
+
 /* Calculate Angular Errors */
 void calculate_errors() {
   
   /* Depth Error Calculation */
   errors.depth_err = setpoints.depth_sp - depth_sensor.depth();
+  depth_error_sum += errors.depth_err;
+  depth_error_sum = threshold_depth_integral_error(depth_error_sum);
   
   /* Roll Error Calculation */
   errors.roll_err = setpoints.roll_sp - eul_angles[ROLL_DATA];
@@ -218,7 +196,7 @@ float pid_to_thrust(float pid_value) {
 
 /* Calculate Correction Values */
 void pid_calculate(User_Commands user_commands) {
-  float roll_pid, pitch_pid, yaw_pid;
+  float roll_pid, pitch_pid, yaw_pid, depth_pid;
   float roll_deriv, pitch_deriv, yaw_deriv;
   
   /* Proportional Calculations */
@@ -228,6 +206,7 @@ void pid_calculate(User_Commands user_commands) {
   /* Derivative Calculations */
   roll_deriv = eul_angles[ROLL_DATA] - prev_angles[ROLL_DATA];
   pitch_deriv = eul_angles[PITCH_DATA] - prev_angles[PITCH_DATA];
+  depth_deriv = depth_sensor.depth() - prev_depth;
 
   /* Roll PID Calculation */
   roll_pid = KP_ROLL * errors.roll_err +
@@ -239,7 +218,13 @@ void pid_calculate(User_Commands user_commands) {
               KI_PITCH * error_sum[PITCH_DATA] -
               KD_PITCH * pitch_deriv;
 
+  /* Yaw Proportional Calculation */
   yaw_pid = KP_YAW * errors.yaw_err;
+
+  /* Depth PID Calculation */
+  depth_pid = KP_DEPTH * errors.depth_err +
+              KI_DEPTH * depth_error_sum -
+              KD_DEPTH * depth_deriv;
   
 #ifdef DEBUG_PID
   Serial.print(roll_pid);
@@ -247,10 +232,13 @@ void pid_calculate(User_Commands user_commands) {
   Serial.print(pitch_pid);
   Serial.print("   ");
   Serial.print(yaw_pid);
+  Serial.print("   ");
+  Serial.print(depth_pid);
   Serial.println();
 #endif
 
   pid_output.roll_corr = pid_to_thrust(roll_pid);
   pid_output.pitch_corr = pid_to_thrust(pitch_pid);
   pid_output.yaw_corr = pid_to_thrust(yaw_pid);
+  pid_output.depth_corr = pid_to_thrust(depth_pid);
 }
