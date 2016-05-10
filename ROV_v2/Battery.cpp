@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "Battery.h"
 
 volatile int battery_percent = 0;

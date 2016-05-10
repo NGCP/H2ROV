@@ -145,6 +145,8 @@ int16_t threshold_integral_error(int16_t error) {
 
 /* Thresholds Depth Integral Error */
 float threshold_depth_integral_error(float error) {
+  float output = error;
+  
   if (error > DEPTH_INTEGRAL_MAX) {
     output = DEPTH_INTEGRAL_MAX;
   }
@@ -197,7 +199,7 @@ float pid_to_thrust(float pid_value) {
 /* Calculate Correction Values */
 void pid_calculate(User_Commands user_commands) {
   float roll_pid, pitch_pid, yaw_pid, depth_pid;
-  float roll_deriv, pitch_deriv, yaw_deriv;
+  float roll_deriv, pitch_deriv, yaw_deriv, depth_deriv;
   
   /* Proportional Calculations */
   calculate_setpoints(user_commands);

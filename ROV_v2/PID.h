@@ -78,8 +78,8 @@ extern volatile int16_t eul_angles[3];
 extern volatile int16_t prev_angles[3];
 extern volatile int16_t error_sum[3];
 
-extern volatile float prev_depth = 0;
-extern volatile float depth_error_sum = 0;
+extern volatile float prev_depth;
+extern volatile float depth_error_sum;
 
 /* Initialize Depth Sensor */
 void init_depth();
