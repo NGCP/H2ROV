@@ -177,15 +177,26 @@ void motor_calculation(User_Commands user_commands) {
   }
 
   /* Calculate Thrust Values */
-  m1 = depth_ref + pid_output.depth_corr + heave_thrust - pid_output.pitch_corr;
-  m2 = depth_ref + pid_output.depth_corr + heave_thrust + pid_output.pitch_corr;
+  if (user_commands.pid) {
+    m1 = depth_ref + pid_output.depth_corr + heave_thrust - pid_output.pitch_corr;
+    m2 = depth_ref + pid_output.depth_corr + heave_thrust + pid_output.pitch_corr;
 
-  pitch_correction = pitch_stabilization(m1, m2, eul_angles[PITCH_DATA]);
+    pitch_correction = pitch_stabilization(m1, m2, eul_angles[PITCH_DATA]);
 
-  m3 = surge_thrust + pid_output.yaw_corr - pitch_correction;
-  m4 = surge_thrust - pid_output.yaw_corr - pitch_correction;
-  m5 = sway_thrust - pid_output.roll_corr;
-  m6 = sway_thrust + pid_output.roll_corr;
+    m3 = surge_thrust + pid_output.yaw_corr - pitch_correction;
+    m4 = surge_thrust - pid_output.yaw_corr - pitch_correction;
+    m5 = sway_thrust - pid_output.roll_corr;
+    m6 = sway_thrust + pid_output.roll_corr;
+  }
+  /* PID Off */
+  else {
+    m1 = heave_thrust;
+    m2 = heave_thrust;
+    m3 = surge_thrust;
+    m4 = surge_thrust;
+    m5 = sway_thrust;
+    m6 = sway_thrust;
+  }
 
   /* Verifies Thrust Values are Within Range */
   m1 = verify_thrust(m1);

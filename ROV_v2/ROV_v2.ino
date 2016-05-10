@@ -22,12 +22,6 @@ void loop() {
   /* Get User Commands */
   command.parse_command();
   user_commands = command.get_user_commands();
-  
-  Serial.print("Depth: ");
-  Serial.print(user_commands.hold_depth);
-  Serial.print("   PID: ");
-  Serial.print(user_commands.pid);
-  Serial.println();
 
   /* PID Correction */
   pid_calculate(user_commands);
