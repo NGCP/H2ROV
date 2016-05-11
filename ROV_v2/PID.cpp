@@ -11,18 +11,32 @@ volatile int16_t error_sum[3] = {0, 0, 0};
 volatile float prev_depth = 0;
 volatile float depth_error_sum = 0;
 
+volatile PID_Gains pid_gains = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 MS5837 depth_sensor;
 
 /* Initialize Depth Sensor */
 void init_depth() {
   depth_sensor.init();
-  depth_sensor.setFluidDensity(1029);
+  depth_sensor.setFluidDensity(FLUID_DENSITY);
 }
 
 /* Initialize PID Controller */
 void init_pid() {
   int16_t imu_data[3] = {0, 0, 0};
   
+  /* Initialize PID Gains */
+  pid_gains.kp_roll = KP_ROLL;
+  pid_gains.ki_roll = KI_ROLL;
+  pid_gains.kd_roll = KD_ROLL;
+  pid_gains.kp_pitch = KP_PITCH;
+  pid_gains.ki_pitch = KI_PITCH;
+  pid_gains.kd_pitch = KD_PITCH;
+  pid_gains.kp_yaw = KP_YAW;
+  pid_gains.kp_depth = KP_DEPTH;
+  pid_gains.ki_depth = KP_DEPTH;
+  pid_gains.kd_depth = KP_DEPTH;
+
   /* Initialize Depth Sensor */
   init_depth();
   depth_sensor.read();
@@ -49,8 +63,8 @@ void send_system_data(int16_t *imu_data) {
   uint8_t roll, pitch, yaw, battery, depth;
   uint8_t rpy[4] = {0, 0, 0, 0};
   
-  roll = ((imu_data[ROLL_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
-  pitch = ((imu_data[PITCH_DATA] / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
+  roll = (((imu_data[ROLL_DATA] - ref_sp.roll_sp) / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
+  pitch = (((imu_data[PITCH_DATA] - ref_sp.pitch_sp) / ANGLE_SCALE) + ANGLE_OFFSET) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   yaw = ((imu_data[YAW_DATA] / ANGLE_SCALE)) * ((float)MAX_BYTE / (float)MAX_ANGLE);
   
   battery = get_battery_level();
@@ -160,6 +174,15 @@ float threshold_depth_integral_error(float error) {
 /* Calculate Angular Errors */
 void calculate_errors() {
   
+#ifdef DEBUG_ANGLES
+  Serial.print((int)((eul_angles[ROLL_DATA] - ref_sp.roll_sp) / ANGLE_SCALE));
+  Serial.print("   ");
+  Serial.print((int)((eul_angles[PITCH_DATA] - ref_sp.pitch_sp) / ANGLE_SCALE));
+  Serial.print("   ");
+  Serial.print((int)((eul_angles[YAW_DATA]) / ANGLE_SCALE));
+  Serial.println();
+#endif
+  
   /* Depth Error Calculation */
   errors.depth_err = setpoints.depth_sp - depth_sensor.depth();
   depth_error_sum += errors.depth_err;
@@ -211,22 +234,22 @@ void pid_calculate(User_Commands user_commands) {
   depth_deriv = depth_sensor.depth() - prev_depth;
 
   /* Roll PID Calculation */
-  roll_pid = KP_ROLL * errors.roll_err +
-             KI_ROLL * error_sum[ROLL_DATA] -
-             KD_ROLL * roll_deriv;
+  roll_pid = pid_gains.kp_roll * errors.roll_err +
+             pid_gains.ki_roll * error_sum[ROLL_DATA] -
+             pid_gains.kd_roll * roll_deriv;
 
   /* Pitch PID Calculation */
-  pitch_pid = KP_PITCH * errors.pitch_err +
-              KI_PITCH * error_sum[PITCH_DATA] -
-              KD_PITCH * pitch_deriv;
+  pitch_pid = pid_gains.kp_pitch * errors.pitch_err +
+              pid_gains.ki_pitch * error_sum[PITCH_DATA] -
+              pid_gains.kd_pitch * pitch_deriv;
 
   /* Yaw Proportional Calculation */
-  yaw_pid = KP_YAW * errors.yaw_err;
+  yaw_pid = pid_gains.kp_yaw * errors.yaw_err;
 
   /* Depth PID Calculation */
-  depth_pid = KP_DEPTH * errors.depth_err +
-              KI_DEPTH * depth_error_sum -
-              KD_DEPTH * depth_deriv;
+  depth_pid = pid_gains.kp_depth * errors.depth_err +
+              pid_gains.ki_depth * depth_error_sum -
+              pid_gains.kd_depth * depth_deriv;
   
 #ifdef DEBUG_PID
   Serial.print(roll_pid);
@@ -243,4 +266,22 @@ void pid_calculate(User_Commands user_commands) {
   pid_output.pitch_corr = pid_to_thrust(pitch_pid);
   pid_output.yaw_corr = pid_to_thrust(yaw_pid);
   pid_output.depth_corr = pid_to_thrust(depth_pid);
+}
+
+/* Run System */
+void run_system(User_Commands user_commands) {
+  /* PID Correction */
+  pid_calculate(user_commands);
+
+  /* Motor Calculation */
+  motor_calculation(user_commands);
+  
+  /* Actuate Motors */
+  set_motor_speed(user_commands.power);
+}
+
+/* Tune PID Gains */
+void tune_PID(User_Commands user_commands) {
+  double roll_gains[NUM_GAINS], pitch_gains[NUM_GAINS], yaw_gains[1], depth_gains[NUM_GAINS];
+  double roll_steps[NUM_GAINS], pitch_steps[NUM_GAINS], yaw_steps[1], depth_steps[NUM_GAINS];
 }

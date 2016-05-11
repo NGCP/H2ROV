@@ -11,6 +11,7 @@
 //#define DEBUG_PID
 //#define DEBUG_BATTERY
 //#define DEBUG_DEPTH
+#define DEBUG_ANGLES
 
 /* PID Parameters */
 #define KP_ROLL 5
@@ -45,6 +46,9 @@
 #define YAW_DATA 0
 #define ROLL_DATA 1
 #define PITCH_DATA 2
+#define NUM_GAINS 3
+
+#define FLUID_DENSITY 1029 // Saltwater: 1029  |  Freshwater: 1000
 
 /* Setpoints */
 typedef struct Setpoints {
@@ -71,6 +75,19 @@ typedef struct PID_Out {
   float depth_corr;
 }PID_Out;
 
+typedef struct PID_Gains {
+  float kp_roll;
+  float ki_roll;
+  float kd_roll;
+  float kp_pitch;
+  float ki_pitch;
+  float kd_pitch;
+  float kp_yaw;
+  float kp_depth;
+  float ki_depth;
+  float kd_depth;
+}PID_Gains;
+
 extern volatile PID_Out pid_output;
 extern volatile Setpoints setpoints;
 extern volatile Errors errors;
@@ -80,6 +97,8 @@ extern volatile int16_t error_sum[3];
 
 extern volatile float prev_depth;
 extern volatile float depth_error_sum;
+
+extern volatile PID_Gains pid_gains;
 
 /* Initialize Depth Sensor */
 void init_depth();

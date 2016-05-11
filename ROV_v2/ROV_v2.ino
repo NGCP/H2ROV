@@ -32,6 +32,8 @@ void loop() {
   /* Actuate Motors */
   set_motor_speed(user_commands.power);
   
+//  readEulData(imu_data);
+//  
 //  Serial.print((int)(imu_data[ROLL_DATA] / 16.0));
 //  Serial.print("   ");
 //  Serial.print((int)(imu_data[PITCH_DATA] / 16.0));
