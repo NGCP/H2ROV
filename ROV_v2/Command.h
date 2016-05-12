@@ -42,6 +42,7 @@ typedef struct User_Commands {
   bool power;
   bool hold_depth;
   bool pid;
+  bool tune;
   int user_speed;
 } User_Commands;
 

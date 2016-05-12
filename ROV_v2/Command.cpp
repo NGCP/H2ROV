@@ -8,6 +8,7 @@ Command::Command() {
   memset(&user_commands, 0, sizeof(User_Commands));
   user_commands.power = false;
   user_commands.hold_depth = false;
+  user_commands.tune = false;
 }
 
 /* Checks for High Bit */

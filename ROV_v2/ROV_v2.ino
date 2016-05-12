@@ -23,6 +23,11 @@ void loop() {
   command.parse_command();
   user_commands = command.get_user_commands();
 
+  /* Tune PID */
+  if (user_commands.tune) {
+    tune_all(user_commands);
+  }
+
   /* PID Correction */
   pid_calculate(user_commands);
 
@@ -31,13 +36,4 @@ void loop() {
   
   /* Actuate Motors */
   set_motor_speed(user_commands.power);
-  
-//  readEulData(imu_data);
-//  
-//  Serial.print((int)(imu_data[ROLL_DATA] / 16.0));
-//  Serial.print("   ");
-//  Serial.print((int)(imu_data[PITCH_DATA] / 16.0));
-//  Serial.print("   ");
-//  Serial.print((int)(imu_data[YAW_DATA] / 16.0));
-//  Serial.println();
 }

@@ -280,8 +280,127 @@ void run_system(User_Commands user_commands) {
   set_motor_speed(user_commands.power);
 }
 
+/* Initialize PID Tuning */
+void init_tuning(float **gain_steps) {
+   for (int i = 0; i < NUM_GAINS; i++) {
+      (*gain_steps)[i] = INITIAL_STEP;
+   }
+}
+
+/* Return Summation of Gain Step Array */
+float sum_gain_steps(float *steps) {
+   float sum = 0;
+
+   for (int i = 0; i < NUM_GAINS; i++) {
+      sum += steps[i];
+   }
+
+   return sum;
+}
+
+float get_error(int PID_id) {
+  float error;
+
+  switch (PID_id) {
+    case ROLL_DATA:
+      error = errors.roll_err;
+      break;
+    case PITCH_DATA:
+      error = errors.pitch_err;
+      break;
+    case YAW_DATA:
+      error = errors.yaw_err;
+      break;
+    case DEPTH_DATA:
+      error = errors.depth_err;
+      break;
+    default:
+      error = 0;
+      break;
+  }
+
+  return error;
+}
+
 /* Tune PID Gains */
-void tune_PID(User_Commands user_commands) {
-  double roll_gains[NUM_GAINS], pitch_gains[NUM_GAINS], yaw_gains[1], depth_gains[NUM_GAINS];
-  double roll_steps[NUM_GAINS], pitch_steps[NUM_GAINS], yaw_steps[1], depth_steps[NUM_GAINS];
+void tune_PID(User_Commands user_commands, float **params, float **steps, int PID_id) {
+  float step_sum = sum_gain_steps(*steps);
+  float cur_error, min_error;
+
+  init_tuning(steps);
+
+  run_system(user_commands);
+  min_error = get_error(PID_id);
+
+  /* Run Until Tuned (Based on Threshold) */
+   while (step_sum > STEP_THRESHOLD) {
+      for (int i = 0; i < NUM_GAINS; i++) {
+         (*params)[i] += (*steps)[i];
+         run_system(user_commands);
+         cur_error = get_error(PID_id);
+
+         /* Decreasing Error */
+         if (cur_error < min_error) {
+            min_error = cur_error;
+            (*steps)[i] *= STEP_SCALE_UP;
+         }
+         else {
+            (*params)[i] -= 2.0 * (*steps)[i];
+            run_system(user_commands);
+            cur_error = get_error(PID_id);
+
+            /* Decreasing Error */
+            if (cur_error < min_error) {
+               min_error = cur_error;
+               (*steps)[i] *= STEP_SCALE_UP;
+            }
+            /* Decrease Step Size */
+            else {
+               (*params)[i] += (*steps)[i];
+               (*steps)[i] *= STEP_SCALE_DOWN;
+            }
+         }
+      }
+      step_sum = sum_gain_steps(*steps);
+   }
+}
+
+/* Tune All PID Controllers */
+void tune_all(User_Commands user_commands) {
+  float *roll_gains = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *roll_steps = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *pitch_gains = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *pitch_steps = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *yaw_gains = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *yaw_steps = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *depth_gains = (float *)calloc(NUM_GAINS, sizeof(float));
+  float *depth_steps = (float *)calloc(NUM_GAINS, sizeof(float));
+
+  tune_PID(user_commands, &roll_gains, &roll_steps, ROLL_DATA);
+  tune_PID(user_commands, &pitch_gains, &pitch_steps, PITCH_DATA);
+  //tune_PID(user_commands, &yaw_gains, &yaw_steps, YAW_DATA);
+  tune_PID(user_commands, &depth_gains, &depth_steps, DEPTH_DATA);
+
+  pid_gains.kp_roll = roll_gains[P_PARAM];
+  pid_gains.ki_roll = roll_gains[I_PARAM];
+  pid_gains.kd_roll = roll_gains[D_PARAM];
+
+  pid_gains.kp_pitch = pitch_gains[P_PARAM];
+  pid_gains.ki_pitch = pitch_gains[I_PARAM];
+  pid_gains.kd_pitch = pitch_gains[D_PARAM];
+
+  //pid_gains.kp_yaw = yaw_gains[P_PARAM];
+
+  pid_gains.kp_depth = depth_gains[P_PARAM];
+  pid_gains.ki_depth = depth_gains[I_PARAM];
+  pid_gains.kd_depth = depth_gains[D_PARAM];
+  
+  free(roll_gains);
+  free(roll_steps);
+  free(pitch_gains);
+  free(pitch_gains);
+  free(yaw_gains);
+  free(yaw_gains);
+  free(depth_gains);
+  free(depth_gains);
 }

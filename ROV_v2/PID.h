@@ -46,7 +46,17 @@
 #define YAW_DATA 0
 #define ROLL_DATA 1
 #define PITCH_DATA 2
+#define DEPTH_DATA 3
 #define NUM_GAINS 3
+
+/* PID Tuning Definitions */
+#define INITIAL_STEP 1
+#define STEP_THRESHOLD 0.0001f
+#define STEP_SCALE_DOWN 0.9
+#define STEP_SCALE_UP 1.1
+#define P_PARAM 0
+#define I_PARAM 1
+#define D_PARAM 2
 
 #define FLUID_DENSITY 1029 // Saltwater: 1029  |  Freshwater: 1000
 
@@ -123,5 +133,22 @@ float pid_to_thrust(float pid_value);
 
 /* Calculate Correction Values */
 void pid_calculate(User_Commands user_commands);
+
+/* Run System */
+void run_system(User_Commands user_commands);
+
+/* Initialize PID Tuning */
+void init_tuning(float **gain_steps);
+
+/* Return Summation of Gain Step Array */
+float sum_gain_steps(float *steps);
+
+float get_error(int PID_id);
+
+/* Tune PID Gains */
+void tune_PID(User_Commands user_commands, float **params, float **steps, int PID_id);
+
+/* Tune All PID Controllers */
+void tune_all(User_Commands user_commands);
 
 #endif
