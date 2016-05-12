@@ -19,6 +19,7 @@ const light_shift = 14;
 const power_shift = 15;
 const depth_shift = 16;
 const pid_shift = 17;
+const tune_shift = 18;
 const command_size = 32;
 
 /* Motor Command Constants */
@@ -93,6 +94,7 @@ io.on('connection', function (socket) {
    socket.on('updateSystem', handleSystemState);
    socket.on('updateDepth', handleDepth);
    socket.on('updatePID', handlePID);
+   socket.on('tunePID', handlePIDTune);
 });
 
 /* Indicate Server Running */
@@ -193,6 +195,22 @@ function handlePID(data) {
    send_command();
 }
 
+/* Handles PID Tuning */
+function handlePIDTune(data) {
+   var newData = JSON.parse(data);
+   var state = newData.state;
+   
+   if (state == '1') {
+      set_tune('on');
+   }
+   else {
+      set_tune('off');
+   }
+      
+   /* Send Newly Updated Command */
+   send_command();
+}
+
 /* Handles Motor Commands */
 function handleMotorChange(data) {
    var newData = JSON.parse(data);
@@ -279,6 +297,20 @@ function set_PID(setting) {
          break;
       default:
          throw new Error("Invalid PID setting: use 'on' or 'off'");
+   }
+}
+
+/* Set PID Tuning Bit */
+function set_PID(setting) {
+   switch (setting) {
+      case 'on':
+         set_bit(tune_shift);
+         break;
+      case 'off':
+         clear_bit(tune_shift);
+         break;
+      default:
+         throw new Error("Invalid PID tune setting: use 'on' or 'off'");
    }
 }
 
