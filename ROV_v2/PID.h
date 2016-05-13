@@ -11,7 +11,7 @@
 //#define DEBUG_PID
 //#define DEBUG_BATTERY
 //#define DEBUG_DEPTH
-#define DEBUG_ANGLES
+//#define DEBUG_ANGLES
 
 /* PID Parameters */
 #define KP_ROLL 5

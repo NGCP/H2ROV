@@ -178,6 +178,11 @@ void motor_calculation(User_Commands user_commands) {
 
   /* Calculate Thrust Values */
   if (user_commands.pid) {
+
+    if (!user_commands.hold_depth) {
+      depth_ref = 0;
+    }
+
     m1 = depth_ref + pid_output.depth_corr + heave_thrust - pid_output.pitch_corr;
     m2 = depth_ref + pid_output.depth_corr + heave_thrust + pid_output.pitch_corr;
 

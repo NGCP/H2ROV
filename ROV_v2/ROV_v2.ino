@@ -12,7 +12,7 @@ User_Commands user_commands;
 void setup() {
   init_motors();
   IMU_setup();
-  _delay_ms(1000);
+  _delay_ms(5000);
   init_pid();
   Serial.begin(115200);
 }
