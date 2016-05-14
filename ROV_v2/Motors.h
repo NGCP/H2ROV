@@ -7,15 +7,15 @@
 #include "Command.h"
 
 /* Uncomment to Print PWM Values */
-//#define DEBUG_PWM
+#define DEBUG_PWM
 
 /* Thruster Pins */
-#define M1_PIN 8
-#define M2_PIN 9
-#define M3_PIN 10
-#define M4_PIN 11
-#define M5_PIN 12
-#define M6_PIN 13
+#define M1_PIN 2
+#define M2_PIN 3
+#define M3_PIN 4
+#define M4_PIN 5
+#define M5_PIN 6
+#define M6_PIN 7
 
 /* Forward/Reverse Values */
 #define FWD 0
@@ -43,7 +43,7 @@
 #define NUM_SPEEDS 7
 
 /* Physical Considerations */
-#define BUOY 0.0f
+#define BUOY 1.0f
 #define MAX_PITCH 45
 
 typedef struct Motors {

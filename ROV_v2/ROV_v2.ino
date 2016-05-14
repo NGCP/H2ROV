@@ -12,7 +12,7 @@ User_Commands user_commands;
 void setup() {
   init_motors();
   IMU_setup();
-  _delay_ms(1000);
+  _delay_ms(5000);
   init_pid();
   Serial.begin(115200);
 }
@@ -23,6 +23,11 @@ void loop() {
   command.parse_command();
   user_commands = command.get_user_commands();
 
+  /* Tune PID */
+  if (user_commands.tune) {
+    tune_all(user_commands);
+  }
+
   /* PID Correction */
   pid_calculate(user_commands);
 
@@ -31,31 +36,4 @@ void loop() {
   
   /* Actuate Motors */
   set_motor_speed(user_commands.power);
-  
-//  Serial.print((int)(imu_data[ROLL_DATA] / 16.0));
-//  Serial.print("   ");
-//  Serial.print((int)(imu_data[PITCH_DATA] / 16.0));
-//  Serial.print("   ");
-//  Serial.print((int)(imu_data[YAW_DATA] / 16.0));
-//  Serial.println();
-  
-//  depth_sensor.read();
-//  
-//  Serial.print("Pressure: "); 
-//  Serial.print(depth_sensor.pressure()); 
-//  Serial.println(" mbar");
-//  
-//  Serial.print("Temperature: "); 
-//  Serial.print(depth_sensor.temperature()); 
-//  Serial.println(" deg C");
-//  
-//  Serial.print("Depth: "); 
-//  Serial.print(depth_sensor.depth()); 
-//  Serial.println(" m");
-//  
-//  Serial.print("Altitude: "); 
-//  Serial.print(depth_sensor.altitude()); 
-//  Serial.println(" m above mean sea level");
-//  
-//  delay(1000);
 }
