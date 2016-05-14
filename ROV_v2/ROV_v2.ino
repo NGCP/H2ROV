@@ -12,7 +12,7 @@ User_Commands user_commands;
 void setup() {
   init_motors();
   IMU_setup();
-  _delay_ms(5000);
+  _delay_ms(1000);
   init_pid();
   Serial.begin(115200);
 }
@@ -26,6 +26,7 @@ void loop() {
   /* Tune PID */
   if (user_commands.tune) {
     tune_all(user_commands);
+    user_commands.tune = false;
   }
 
   /* PID Correction */

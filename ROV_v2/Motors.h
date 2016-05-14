@@ -7,7 +7,7 @@
 #include "Command.h"
 
 /* Uncomment to Print PWM Values */
-#define DEBUG_PWM
+//#define DEBUG_PWM
 
 /* Thruster Pins */
 #define M1_PIN 2
@@ -43,7 +43,7 @@
 #define NUM_SPEEDS 7
 
 /* Physical Considerations */
-#define BUOY 1.0f
+#define BUOY 2.0f
 #define MAX_PITCH 45
 
 typedef struct Motors {

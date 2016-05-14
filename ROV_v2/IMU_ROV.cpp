@@ -153,8 +153,9 @@ void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * des
             dest[i++] = Wire.read();
            }         // Put read results in the Rx buffer
         }
-        if (i<count)
-          Serial.println("DIAG:Timeout reading I2c;");
+        if (i<count) {
+          //Serial.println("DIAG:Timeout reading I2c;");
+        }
 }
 
 

@@ -11,6 +11,7 @@
 #define POWER_SHIFT 15
 #define DEPTH_SHIFT 16
 #define PID_SHIFT 17
+#define TUNE_SHIFT 18
 #define COMMAND_SIZE 32
 
 /* Motor Command Constants */
@@ -55,11 +56,12 @@ class Command {
 
   private:
     User_Commands user_commands;
-    int command;
+    unsigned long command;
     bool check_parity();
     bool check_bit(int bitshift);
     void parse_light();
     void parse_power();
+    void parse_tune();
     void parse_depth();
     void parse_speed();
     void parse_motor();

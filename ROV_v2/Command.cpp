@@ -50,6 +50,11 @@ void Command::parse_power() {
   user_commands.power = check_bit(POWER_SHIFT);
 }
 
+void Command::parse_tune() {
+  user_commands.tune = check_bit(TUNE_SHIFT);
+ // Serial.println(check_bit(TUNE_SHIFT));
+}
+
 void Command::parse_depth() {
   user_commands.hold_depth = check_bit(DEPTH_SHIFT);
 }
@@ -76,6 +81,7 @@ void Command::parse_motor() {
 /* Parses Command Vector */
 bool Command::parse_command() {
   byte data[4];
+  unsigned long temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0;
   
   /* Initialize Data to Zero */
   for (int i = 0; i < 4; i++) {
@@ -85,17 +91,26 @@ bool Command::parse_command() {
   if (Serial1.available() >= 4) {
     Serial1.readBytes(data, 4);
     command = 0;
-    command |= (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+    temp1 = data[0];
+    temp2 = data[1];
+    temp3 = data[2];
+    temp4 = data[3];
+    command = (temp1 << 24) | (temp2 << 16) | (temp3 << 8) | (temp4);
+    //Serial.println(command, BIN);
   }
 
   if (!check_parity()) {
     return false;
   }
-
+  //Serial.println(command, BIN);
   parse_light();
   parse_power();
+  parse_depth();
+  parse_tune();
   parse_speed();
   parse_motor();
+  
+  //Serial.println(command, BIN);
 
   return true;
 }
