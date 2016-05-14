@@ -301,7 +301,7 @@ function set_PID(setting) {
 }
 
 /* Set PID Tuning Bit */
-function set_PID(setting) {
+function set_tune(setting) {
    switch (setting) {
       case 'on':
          set_bit(tune_shift);
@@ -357,6 +357,8 @@ function clear_motor() {
 function send_command() { 
    var command1 = 0, command2 = 0, command3 = 0, command4 = 0;
    set_parity();
+   
+   console.log(bin(command));
 
    /* Splits Command Vector into Four Separate Bytes */
    command1 |= (command >> 24) & 0xFF;
@@ -369,6 +371,8 @@ function send_command() {
    b.serialWrite(port, [command2]);
    b.serialWrite(port, [command3]);
    b.serialWrite(port, [command4]);
+   
+   clear_bit(tune_shift);
 }
 
 /* Clears Command Vector */

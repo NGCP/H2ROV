@@ -92,6 +92,7 @@
         }
         
         function handleKeyPressed(event) {
+            event.preventDefault();
             keymap[event.keyCode] = true;
             updateKeyVector();
         }
@@ -133,13 +134,8 @@
         }
 
         function pidTune(state) {
-            if (state == 0) {
-                socket.emit('tunePID', '{"state":0}');
-                document.getElementById("tuning").innerHTML = "OFF";
-            }
-            else if (state == 1) {
-                socket.emit('updatePID', '{"state":1}');
-                document.getElementById("tuning").innerHTML = "ON";
+            if (state == 1) {
+                socket.emit('tunePID', '{"state":1}');
             }
         }
         
@@ -326,7 +322,7 @@
                     <button type="button" onclick="pidState(1);">ON</button>
                     <button type="button" onclick="pidState(0);">OFF</button>
                     <p style="margin: 0px; padding-top: 0px;">Tune PID</p>
-                    <button type="button" onclick="tunePID(1);">ON</button>
+                    <button type="button" onclick="pidTune(1);">ON</button>
                 </td>
             </tr>
         </table>
