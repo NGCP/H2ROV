@@ -358,7 +358,7 @@ function send_command() {
    var command1 = 0, command2 = 0, command3 = 0, command4 = 0;
    set_parity();
    
-   console.log(bin(command));
+   //console.log(bin(command));
 
    /* Splits Command Vector into Four Separate Bytes */
    command1 |= (command >> 24) & 0xFF;
