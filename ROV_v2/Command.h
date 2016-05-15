@@ -61,6 +61,7 @@ class Command {
     bool check_bit(int bitshift);
     void parse_light();
     void parse_power();
+    void parse_pid();
     void parse_tune();
     void parse_depth();
     void parse_speed();

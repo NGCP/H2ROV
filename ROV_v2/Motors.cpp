@@ -178,7 +178,6 @@ void motor_calculation(User_Commands user_commands) {
 
   /* Calculate Thrust Values */
   if (user_commands.pid) {
-
     if (!user_commands.hold_depth) {
       depth_ref = 0;
     }

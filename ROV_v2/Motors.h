@@ -7,7 +7,7 @@
 #include "Command.h"
 
 /* Uncomment to Print PWM Values */
-//#define DEBUG_PWM
+#define DEBUG_PWM
 
 /* Thruster Pins */
 #define M1_PIN 2

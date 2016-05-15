@@ -7,6 +7,7 @@ Command::Command() {
   command = 0;
   memset(&user_commands, 0, sizeof(User_Commands));
   user_commands.power = false;
+  user_commands.pid = true;
   user_commands.hold_depth = false;
   user_commands.tune = false;
 }
@@ -50,9 +51,12 @@ void Command::parse_power() {
   user_commands.power = check_bit(POWER_SHIFT);
 }
 
+void Command::parse_pid() {
+  user_commands.pid = check_bit(PID_SHIFT);
+}
+
 void Command::parse_tune() {
   user_commands.tune = check_bit(TUNE_SHIFT);
- // Serial.println(check_bit(TUNE_SHIFT));
 }
 
 void Command::parse_depth() {
@@ -105,6 +109,7 @@ bool Command::parse_command() {
   //Serial.println(command, BIN);
   parse_light();
   parse_power();
+  parse_pid();
   parse_depth();
   parse_tune();
   parse_speed();
